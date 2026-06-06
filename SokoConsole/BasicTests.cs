@@ -47,15 +47,92 @@ public class BasicTests : BaseTests
     
     public void PlayerPushesTwoAdjacentCrates()
     {
-        
+        var player = StartingFrame.AddEntity(EntityTemplate.Player(GridPosition.Zero));
+        var crate1 = StartingFrame.AddEntity(EntityTemplate.Crate(new GridPosition(1, 0)));
+        var crate2 = StartingFrame.AddEntity(EntityTemplate.Crate(new GridPosition(2, 0)));
+
+        ApplyAndResolve(new SetMoveIntentTransform(player, CardinalDirection.Right));
+
+        // Nobody moved
+        SimpleAssert.ShouldBe(CurrentFrame.GetEntity(player).Position, new GridPosition(0, 0));
+        SimpleAssert.ShouldBe(CurrentFrame.GetEntity(crate1).Position, new GridPosition(1, 0));
+        SimpleAssert.ShouldBe(CurrentFrame.GetEntity(crate2).Position, new GridPosition(2, 0));
     }
 
     public void PlayerPushesGlass()
     {
+        var player = StartingFrame.AddEntity(EntityTemplate.Player(GridPosition.Zero));
+        var glass = StartingFrame.AddEntity(EntityTemplate.GlassLightCrate(new GridPosition(1, 0)));
+
+        ApplyAndResolve(new SetMoveIntentTransform(player, CardinalDirection.Right));
+
+        // glass has moved, so has player
+        SimpleAssert.ShouldBe(CurrentFrame.GetEntity(player).Position, new GridPosition(1, 0));
+        SimpleAssert.ShouldBe(CurrentFrame.GetEntity(glass).Position, new GridPosition(2, 0));
+
+        ApplyAndResolve(new SetMoveIntentTransform(player, CardinalDirection.Right));
+
+        // glass has moved again
+        SimpleAssert.ShouldBe(CurrentFrame.GetEntity(player).Position, new GridPosition(2, 0));
+        SimpleAssert.ShouldBe(CurrentFrame.GetEntity(glass).Position, new GridPosition(3, 0));
     }
 
     public void PlayerPushesMultipleGlass()
     {
+        var player = StartingFrame.AddEntity(EntityTemplate.Player(GridPosition.Zero));
+        var glass1 = StartingFrame.AddEntity(EntityTemplate.GlassLightCrate(new GridPosition(1, 0)));
+        var glass2 = StartingFrame.AddEntity(EntityTemplate.GlassLightCrate(new GridPosition(2, 0)));
+
+        ApplyAndResolve(new SetMoveIntentTransform(player, CardinalDirection.Right));
+
+        // Everybody moved
+        SimpleAssert.ShouldBe(CurrentFrame.GetEntity(player).Position, new GridPosition(1, 0));
+        SimpleAssert.ShouldBe(CurrentFrame.GetEntity(glass1).Position, new GridPosition(2, 0));
+        SimpleAssert.ShouldBe(CurrentFrame.GetEntity(glass2).Position, new GridPosition(3, 0));
+    }
+    
+    public void PlayerPushesMultipleGlass_DifferentOrder()
+    {
+        var player = StartingFrame.AddEntity(EntityTemplate.Player(GridPosition.Zero));
+        var glass2 = StartingFrame.AddEntity(EntityTemplate.GlassLightCrate(new GridPosition(2, 0)));
+        var glass1 = StartingFrame.AddEntity(EntityTemplate.GlassLightCrate(new GridPosition(1, 0)));
+
+        ApplyAndResolve(new SetMoveIntentTransform(player, CardinalDirection.Right));
+
+        // Everybody moved
+        SimpleAssert.ShouldBe(CurrentFrame.GetEntity(player).Position, new GridPosition(1, 0));
+        SimpleAssert.ShouldBe(CurrentFrame.GetEntity(glass1).Position, new GridPosition(2, 0));
+        SimpleAssert.ShouldBe(CurrentFrame.GetEntity(glass2).Position, new GridPosition(3, 0));
+    }
+
+    public void PlayerPushesCrateIntoWall()
+    {
+        var player = StartingFrame.AddEntity(EntityTemplate.Player(GridPosition.Zero));
+        var crate = StartingFrame.AddEntity(EntityTemplate.Crate(new GridPosition(1, 0)));
+        var wall = StartingFrame.AddEntity(EntityTemplate.Wall(new GridPosition(2, 0)));
+        
+        ApplyAndResolve(new SetMoveIntentTransform(player, CardinalDirection.Right));
+        
+        // Nobody moved
+        SimpleAssert.ShouldBe(CurrentFrame.GetEntity(player).Position, new GridPosition(0, 0));
+        SimpleAssert.ShouldBe(CurrentFrame.GetEntity(crate).Position, new GridPosition(1, 0));
+        SimpleAssert.ShouldBe(CurrentFrame.GetEntity(wall).Position, new GridPosition(2, 0));
+        SimpleAssert.ShouldBe(CurrentFrame.IsResolved(), true);
+    }
+    
+    public void PlayerPushesGlassIntoWall()
+    {
+        var player = StartingFrame.AddEntity(EntityTemplate.Player(GridPosition.Zero));
+        var glass = StartingFrame.AddEntity(EntityTemplate.GlassLightCrate(new GridPosition(1, 0)));
+        var wall = StartingFrame.AddEntity(EntityTemplate.Wall(new GridPosition(2, 0)));
+        
+        ApplyAndResolve(new SetMoveIntentTransform(player, CardinalDirection.Right));
+        
+        // Nobody moved
+        SimpleAssert.ShouldBe(CurrentFrame.GetEntity(player).Position, new GridPosition(0, 0));
+        SimpleAssert.ShouldBe(CurrentFrame.GetEntity(glass).Position, new GridPosition(1, 0));
+        SimpleAssert.ShouldBe(CurrentFrame.GetEntity(wall).Position, new GridPosition(2, 0));
+        SimpleAssert.ShouldBe(CurrentFrame.IsResolved(), true);
     }
 
     public void PlayerIsBlockedByWater()

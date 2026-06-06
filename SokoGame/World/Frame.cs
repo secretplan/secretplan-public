@@ -7,8 +7,6 @@ public class Frame
 {
     private readonly uint _frameId;
     private readonly FrameIdSource _frameIdSource;
-
-    private readonly Dictionary<EntityId, Entity> _lookup = new();
     private EntityId _currentId;
 
     public Frame(FrameIdSource frameIdSource)
@@ -16,6 +14,13 @@ public class Frame
         _frameIdSource = frameIdSource;
         _frameId = _frameIdSource.NextFrameId();
     }
+
+    /// <summary>
+    ///     This should be set to true if ANY "Set" method is called
+    /// </summary>
+    public bool HasChangedSinceClone { get; private set; }
+
+    private Dictionary<EntityId, Entity> Lookup { get; init; } = new();
 
     public override string ToString()
     {
@@ -25,13 +30,13 @@ public class Frame
     public EntityId AddEntity(Entity entity)
     {
         var id = _currentId++;
-        _lookup[id] = entity with { IsActive = true };
+        Lookup[id] = entity with { IsActive = true };
         return id;
     }
 
     public EntityWithId GetEntityWithId(EntityId id)
     {
-        if (!_lookup.TryGetValue(id, out var value))
+        if (!Lookup.TryGetValue(id, out var value))
         {
             return new EntityWithId(id, new Entity(), false);
         }
@@ -46,7 +51,8 @@ public class Frame
 
     public void SetEntity(EntityId entityId, Entity entity)
     {
-        _lookup[entityId] = entity;
+        HasChangedSinceClone = true;
+        Lookup[entityId] = entity;
     }
 
     /// <summary>
@@ -70,14 +76,10 @@ public class Frame
     /// </summary>
     public Frame Clone()
     {
-        var frame = new Frame(_frameIdSource);
-
-        foreach (var (id, entity) in _lookup)
+        return new Frame(_frameIdSource)
         {
-            frame.SetEntity(id, entity);
-        }
-
-        return frame;
+            Lookup = new Dictionary<EntityId, Entity>(Lookup)
+        };
     }
 
     public AnimatedTransform GetResolveTransform()
@@ -103,11 +105,47 @@ public class Frame
         {
             currentFrame.Log($"Not resolved, applying {nextTransform}");
             transforms.Add(nextTransform);
-            currentFrame = currentFrame.CloneWithTransform(nextTransform);
+            var nextFrame = currentFrame.CloneWithTransform(nextTransform);
+
+            // if (nextFrame.IsSameAs(currentFrame))
+            // {
+            //     nextFrame.Log("Forcing resolve");
+            //     nextFrame.AttemptForceResolve();
+            // }
+
+            currentFrame = nextFrame;
             nextTransform = currentFrame.GetNextTransform();
         }
 
+        // if (currentFrame.GetResolveTransform().IsNoOp())
+        // {
+        //     // we got all the transforms, but we still aren't resolved
+        // }
+
         return transforms;
+    }
+
+    /// <summary>
+    ///     Attempts to force the Frame into a resolved state, not guaranteed to be successful
+    /// </summary>
+    private void AttemptForceResolve()
+    {
+        foreach (var entityWithId in AllActiveEntitiesWithIds())
+        {
+            SetEntity(entityWithId, entityWithId.Entity with
+            {
+                MoveIntent = null
+            });
+        }
+    }
+
+    /// <summary>
+    ///     This could be VERY slow depending on how many entities there are
+    /// </summary>
+    private bool IsSameAs(Frame otherFrame)
+    {
+        var ids = Lookup.Keys;
+        return ids.Count == otherFrame.Lookup.Keys.Count && ids.All(id => GetEntity(id) == otherFrame.GetEntity(id));
     }
 
     private void Log(string message)
@@ -215,7 +253,7 @@ public class Frame
 
                         if (pushRequirement < myPushStrength)
                         {
-                            // entity is very easy to push, we move the entity without losing my intent (will try again next frame)
+                            // entity is very easy to push
                             result.Add(new SetMoveIntentTransform(blockingEntityWithId,
                                 movingEntity.MoveIntent.Value));
                             shouldLoseMoveIntent = false;
@@ -246,12 +284,17 @@ public class Frame
 
     private IEnumerable<EntityWithId> AllActiveEntitiesWithIds()
     {
-        foreach (var (id, entity) in _lookup)
+        foreach (var (id, entity) in Lookup)
         {
             if (entity.IsActive)
             {
                 yield return new EntityWithId(id, entity);
             }
         }
+    }
+
+    public bool IsResolved()
+    {
+        return GetResolveTransform().IsEmptyOrNoOp();
     }
 }

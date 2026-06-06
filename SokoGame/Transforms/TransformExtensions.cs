@@ -11,7 +11,7 @@ public static class TransformExtensions
 
         if (transform is TransformGroup group)
         {
-            return group.IsEmpty();
+            return group.IsEmptyOrNoOp();
         }
 
         return false;

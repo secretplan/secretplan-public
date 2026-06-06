@@ -28,7 +28,7 @@ public class TransformGroup : ITransform
         return result;
     }
 
-    public bool IsEmpty()
+    public bool IsEmptyOrNoOp()
     {
         return _transforms.Count == 0 || _transforms.All(transform => transform.IsNoOp());
     }
