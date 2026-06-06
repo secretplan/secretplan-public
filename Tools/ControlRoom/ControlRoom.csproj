@@ -10,6 +10,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\Packages\SecretPlanCore\SecretPlanCore.csproj" />
+        <ProjectReference Include="..\..\Packages\SecretPlanGodot\SecretPlanGodot.csproj" />
     </ItemGroup>
 
     <ItemGroup>
