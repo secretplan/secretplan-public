@@ -7,7 +7,6 @@ namespace ControlRoom.Core;
 public static class Constants
 {
     public const string SandboxPath = "./.build";
-    public const string MonorepoName = "secretplan-mono";
     public const string VersionFile = "VERSION.json";
 
     public const string SelfRunCommand = "./controlroom";
@@ -20,10 +19,6 @@ public static class Constants
     public const string LogsFolder = "ControlRoomLogs";
     public const string StatePath = "ControlRoomState.json";
 
-    public const string VirtualRepoLocalPath = "VirtualMonorepo";
-
-    public const ulong GitChannelId = 1444924851159695400;
-    public const ulong FlockAroundChannelId = 1416182791388922006;
     public const string TestInternalSteamBranch = "test_internal";
     private static string? _fileName;
 
@@ -50,9 +45,6 @@ public static class Constants
             new SteamDepotInfo(4131072, BuildTarget.MacOsUniversal)
         ]);
 
-
-    public static readonly string VirtualRepoFullPath = Path.Join(SandboxPath, VirtualRepoLocalPath);
-    public static string MonorepoSshUrl => $"git@github.com:secretplan/{MonorepoName}.git";
 
     public static string CurrentLogFile
     {
@@ -163,7 +155,7 @@ public static class Constants
         return $"https://github.com/secretplan/secretplan-mono/tree/{branchName}/PATCH_NOTES.md";
     }
 
-    public static string GetHubWebCommitUrl(string sha)
+    public static string GitHubWebCommitUrl(string sha)
     {
         return $"https://github.com/secretplan/secretplan-mono/commit/{sha}";
     }

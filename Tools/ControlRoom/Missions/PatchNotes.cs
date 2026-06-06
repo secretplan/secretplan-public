@@ -125,7 +125,7 @@ public class PatchNotes : Mission
             if (isRelevantCommit)
             {
                 patchNotesLines.Add(
-                    $"- {commit.Message} (by {commit.Author} [See Commit]({Constants.GetHubWebCommitUrl(commit.Sha)}))");
+                    $"- {commit.Message} (by {commit.Author} [See Commit]({Constants.GitHubWebCommitUrl(commit.Sha)}))");
             }
 
             cache.CommitRelevance[commit.Sha] = isRelevantCommit;

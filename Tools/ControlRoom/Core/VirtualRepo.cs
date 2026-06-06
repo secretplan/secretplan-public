@@ -6,18 +6,44 @@ namespace ControlRoom.Core;
 
 public class VirtualRepo
 {
-    public readonly RealFileSystem Files = new(Constants.VirtualRepoFullPath);
-    public readonly ProgramGit Git = new(Constants.VirtualRepoFullPath);
+    public readonly RealFileSystem Files;
+    public readonly ProgramGit Git;
+    private string? _repoUrl;
+    private readonly string _localPathWithinSandbox;
 
-    private VirtualRepo()
+    private VirtualRepo(string? repoUrl, string localPathWithinSandbox)
     {
+        _repoUrl = repoUrl;
+        var workingDirectory = Path.Join(Constants.SandboxPath, localPathWithinSandbox);
+        _localPathWithinSandbox = localPathWithinSandbox;
+        Git = new ProgramGit(workingDirectory);
+        Files = new RealFileSystem(workingDirectory);
     }
 
-    public static async Task<VirtualRepo> GetAndInitialize()
+    public static async Task<VirtualRepo> GetAndInitialize(string? repoUrl, string localPath)
     {
-        var repo = new VirtualRepo();
+        var repo = new VirtualRepo(repoUrl, localPath);
         await repo.CloneOrReset();
         return repo;
+    }
+    
+    public static async Task<VirtualRepo> GetAndInitialize()
+    {
+        return await GetAndInitialize(null, "VirtualMonoRepo");
+    }
+
+    public async Task<string> RepoUrl()
+    {
+        if (_repoUrl == null)
+        {
+            var rootGit = new ProgramGit(".");
+            var ownRepoUrl = await rootGit.GetOriginUrl();
+            await OutPipe.AgentLogMessage(
+                $"VirtualRepo was not given a URL, so we assume this is the same as the current repo, which is: {ownRepoUrl}");
+            _repoUrl = ownRepoUrl;
+        }
+
+        return _repoUrl;
     }
 
     /// <summary>
@@ -27,18 +53,17 @@ public class VirtualRepo
     {
         Git.LogLevel = LogLevel.LogFileOnly;
         // This git lives in the "sandbox" aka: `.build` 
-        var outerGit = new ProgramGit(Constants.SandboxPath);
-        outerGit.LogLevel = LogLevel.LogFileOnly;
-        await outerGit.CloneWithSsh(Constants.MonorepoSshUrl, Constants.VirtualRepoLocalPath);
-        outerGit.LogLevel = LogLevel.ConsoleAndLogFile;
-        if (!outerGit.WasSuccessful())
+        var sandboxGit = new ProgramGit(Constants.SandboxPath);
+        sandboxGit.LogLevel = LogLevel.LogFileOnly;
+        await sandboxGit.CloneWithSsh(await RepoUrl(), _localPathWithinSandbox);
+        sandboxGit.LogLevel = LogLevel.ConsoleAndLogFile;
+        if (!sandboxGit.WasSuccessful())
         {
             await VirtualRepoLog("Looks like the repo already exists, we will reuse it");
         }
 
-
         var originUrl = await Git.GetOriginUrl();
-        MissionAssert.AreEqual(originUrl, Constants.MonorepoSshUrl,
+        MissionAssert.AreEqual(originUrl, await RepoUrl(),
             $"Virtual repo has wrong remote URL, run `{Constants.GenerateMissionCommand<CleanSandbox>()}`");
 
         await VirtualRepoLog("Setting up repo");
@@ -81,9 +106,9 @@ public class VirtualRepo
         await Git.PushSetUpstream();
     }
 
-    private static Task VirtualRepoLog(string message)
+    private Task VirtualRepoLog(string message)
     {
-        return OutPipe.AgentLogMessage($"VirtualRepo: {message}");
+        return OutPipe.AgentLogMessage($"VirtualRepo ({_localPathWithinSandbox}): {message}");
     }
 
     public FileInfo BuildAndDumpVdf(SteamUploadSku uploadSku, DirectoryInfo contentRoot, string description)
