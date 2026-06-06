@@ -23,6 +23,11 @@ public readonly record struct Offset(int X, int Y)
     {
         return new Offset(-offset.X, -offset.Y);
     }
+    
+    public static implicit operator Offset(CardinalDirection direction)
+    {
+        return FromDirection(direction);
+    }
 
     public static Offset FromDirection(CardinalDirection direction)
     {

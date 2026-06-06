@@ -6,4 +6,9 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Packages\SecretPlanCore\SecretPlanCore.csproj" />
+      <ProjectReference Include="..\SokoCore\SokoCore.csproj" />
+    </ItemGroup>
+
 </Project>

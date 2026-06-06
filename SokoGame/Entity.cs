@@ -1,5 +1,5 @@
-﻿namespace SokoGame;
+﻿using SokoCore;
 
-public class Entity
-{
-}
+namespace SokoGame;
+
+public readonly record struct Entity(bool IsActive, GridPosition? Position, CardinalDirection? MoveIntent);
