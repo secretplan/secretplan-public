@@ -1,13 +1,19 @@
 ﻿using SokoCore;
+using SokoGame.World;
 
 namespace SokoGame.Transforms;
 
-public readonly record struct SetMoveIntentTransform(EntityId EntityId, CardinalDirection? Direction) : ITransform
+public readonly record struct SetMoveIntentTransform(EntityId EntityId, CardinalDirection? DesiredMoveIntent) : ITransform
 {
     public Frame ApplyTo(Frame frame)
     {
         var entity = frame.GetEntity(EntityId);
-        frame.SetEntity(EntityId, entity with { MoveIntent = entity.MoveIntent });
+        frame.SetEntity(EntityId, entity with { MoveIntent = DesiredMoveIntent });
         return frame;
+    }
+    
+    public override string ToString()
+    {
+        return $"SET_MOVE_INTENT {EntityId} {DesiredMoveIntent}";
     }
 }

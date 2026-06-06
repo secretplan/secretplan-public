@@ -1,18 +1,19 @@
 ﻿using SokoGame.Transforms;
 
-namespace SokoGame;
+namespace SokoGame.World;
 
 public class Frame
 {
-    private static uint _frameIdPool;
     private readonly uint _frameId;
+    private readonly FrameIdSource _frameIdSource;
 
     private readonly Dictionary<EntityId, Entity> _lookup = new();
     private EntityId _currentId;
 
-    public Frame()
+    public Frame(FrameIdSource frameIdSource)
     {
-        _frameId = _frameIdPool++;
+        _frameIdSource = frameIdSource;
+        _frameId = _frameIdSource.NextFrameId();
     }
 
     public override string ToString()
@@ -29,12 +30,12 @@ public class Frame
 
     public EntityWithId GetEntityWithId(EntityId id)
     {
-        if (_lookup.ContainsKey(id))
+        if (!_lookup.TryGetValue(id, out var value))
         {
             return new EntityWithId(id, new Entity(), false);
         }
 
-        return new EntityWithId(id, _lookup[id]);
+        return new EntityWithId(id, value);
     }
 
     public Entity GetEntity(EntityId id)
@@ -47,9 +48,28 @@ public class Frame
         _lookup[entityId] = entity;
     }
 
+    /// <summary>
+    ///     Makes a copy of this frame plus a transform
+    /// </summary>
+    public Frame CloneWithTransform(ITransform transform)
+    {
+        return transform.ApplyTo(Clone());
+    }
+
+    /// <summary>
+    ///     Makes a copy of this frame plus a transform, plus any transforms needed to resolve it
+    /// </summary>
+    public Frame CloneWithTransformAndResolve(ITransform transform)
+    {
+        return CloneWithTransform(GetResolveTransform(transform));
+    }
+
+    /// <summary>
+    ///     Makes a carbon-copy of this frame (with a different ID)
+    /// </summary>
     public Frame Clone()
     {
-        var frame = new Frame();
+        var frame = new Frame(_frameIdSource);
 
         foreach (var (id, entity) in _lookup)
         {
@@ -59,27 +79,39 @@ public class Frame
         return frame;
     }
 
-    /// <summary>
-    ///     Obtains the required transforms to get to a Resolved state after applying some initial transforms
-    /// </summary>
-    public AnimatedTransform GetTransformsToResolve(AnimatedTransform startingTransform)
+    public AnimatedTransform GetResolveTransform()
     {
+        return GetResolveTransform(new DoNothingTransform());
+    }
+
+    /// <summary>
+    ///     Obtains a transform that will get us to a resolved state
+    /// </summary>
+    public AnimatedTransform GetResolveTransform(ITransform startingTransform)
+    {
+        Log($"GetTransformsToResolve with starting transform: {startingTransform}");
         var transforms = new AnimatedTransform(TransformAnimationType.InSequence);
 
         transforms.Add(startingTransform);
-        var currentFrame = startingTransform.ApplyTo(Clone());
-        
+        var currentFrame = CloneWithTransform(startingTransform);
+
         // Figure out what we need to do next (if anything)
         var nextTransform = currentFrame.GetNextTransform();
-        
-        while (nextTransform.IsNoOp())
+
+        while (!nextTransform.IsNoOp())
         {
+            currentFrame.Log($"Not resolved, applying {nextTransform}");
             transforms.Add(nextTransform);
-            currentFrame = nextTransform.ApplyTo(currentFrame.Clone());
+            currentFrame = currentFrame.CloneWithTransform(nextTransform);
             nextTransform = currentFrame.GetNextTransform();
         }
 
         return transforms;
+    }
+
+    private void Log(string message)
+    {
+        Global.DebugLog($"{this}: {message}");
     }
 
     /// <summary>
@@ -88,7 +120,7 @@ public class Frame
     private ITransform GetNextTransform()
     {
         // The next transform will be the result of ONE of these functions, prioritized in this order.
-        Func<AnimatedTransform>[] functions = [HandleAllMoveIntents, HandleSignalChanges, HandleSinks];
+        Func<AnimatedTransform>[] functions = [HandleAllMoveIntents, HandleSignalChanges, HandleHeightChanges, HandleCollisions];
 
         foreach (var function in functions)
         {
@@ -102,6 +134,13 @@ public class Frame
         return new DoNothingTransform();
     }
 
+    private AnimatedTransform HandleCollisions()
+    {
+        var result = new AnimatedTransform(TransformAnimationType.AllAtOnce);
+
+        return result;
+    }
+
     private AnimatedTransform HandleSignalChanges()
     {
         var result = new AnimatedTransform(TransformAnimationType.AllAtOnce);
@@ -109,7 +148,7 @@ public class Frame
         return result;
     }
 
-    private AnimatedTransform HandleSinks()
+    private AnimatedTransform HandleHeightChanges()
     {
         var result = new AnimatedTransform(TransformAnimationType.AllAtOnce);
 

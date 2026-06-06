@@ -1,4 +1,6 @@
-﻿namespace SokoGame.Transforms;
+﻿using SokoGame.World;
+
+namespace SokoGame.Transforms;
 
 public class TransformGroup : ITransform
 {
