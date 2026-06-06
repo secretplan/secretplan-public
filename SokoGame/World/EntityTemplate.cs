@@ -13,7 +13,7 @@ public static class EntityTemplate
             FacingDirection = startingFacingDirection,
             Phase = Phase.Solid,
             IsPlayerControlled = true,
-            PushingStrength = 2,
+            PushingStrength = 5,
             IsCameraOwner = true,
             AvoidsFalling = true,
             Graphic = EntityGraphic.CreateCharacter('@', 20)
@@ -25,10 +25,10 @@ public static class EntityTemplate
         return new Entity
         {
             Position = gridPosition,
-            RequiredStrengthToPush = 2,
+            RequiredStrengthToPush = 5,
             Phase = Phase.Solid,
             Density = Density.FloatsInLiquid,
-            Graphic = EntityGraphic.CreateCharacter('H', 10)
+            Graphic = EntityGraphic.CreateCharacter('O', 10)
         };
     }
 
@@ -38,7 +38,7 @@ public static class EntityTemplate
         {
             Phase = Phase.Solid,
             Position = gridPosition,
-            Graphic = EntityGraphic.CreateCharacter('%', 0)
+            Graphic = EntityGraphic.CreateCharacter('#', 0)
         };
     }
 
@@ -49,8 +49,10 @@ public static class EntityTemplate
             Position = gridPosition,
             RequiredStrengthToPush = 1,
             Phase = Phase.Solid,
-            PushingStrength = 1,
-            Graphic = EntityGraphic.CreateCharacter('G', 10)
+            
+            // Strong enough to push other glasses, but not strong enough to push crates
+            PushingStrength = 2,
+            Graphic = EntityGraphic.CreateCharacter('o', 10)
         };
     }
 

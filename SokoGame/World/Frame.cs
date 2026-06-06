@@ -92,7 +92,15 @@ public class Frame
     /// </summary>
     public AnimatedTransform GetResolveTransform(ITransform startingTransform)
     {
-        Log($"GetTransformsToResolve with starting transform: {startingTransform}");
+        if (startingTransform.IsNoOp())
+        {
+            Log($"Resolving from current state");
+        }
+        else
+        {
+            Log($"Resolving with starting transform: {startingTransform}");
+        }
+
         var transforms = new AnimatedTransform(TransformAnimationType.InSequence);
 
         transforms.Add(startingTransform);
@@ -105,22 +113,9 @@ public class Frame
         {
             currentFrame.Log($"Not resolved, applying {nextTransform}");
             transforms.Add(nextTransform);
-            var nextFrame = currentFrame.CloneWithTransform(nextTransform);
-
-            // if (nextFrame.IsSameAs(currentFrame))
-            // {
-            //     nextFrame.Log("Forcing resolve");
-            //     nextFrame.AttemptForceResolve();
-            // }
-
-            currentFrame = nextFrame;
+            currentFrame = currentFrame.CloneWithTransform(nextTransform);
             nextTransform = currentFrame.GetNextTransform();
         }
-
-        // if (currentFrame.GetResolveTransform().IsNoOp())
-        // {
-        //     // we got all the transforms, but we still aren't resolved
-        // }
 
         return transforms;
     }
@@ -148,7 +143,7 @@ public class Frame
         return ids.Count == otherFrame.Lookup.Keys.Count && ids.All(id => GetEntity(id) == otherFrame.GetEntity(id));
     }
 
-    private void Log(string message)
+    public void Log(string message)
     {
         GlobalDebug.DebugLog($"{this}: {message}");
     }
@@ -207,74 +202,102 @@ public class Frame
                 continue;
             }
 
-            var targetPosition = movingEntity.Position + movingEntity.MoveIntent.Value;
-            var movingEntityDepth = movingEntity.Depth;
-            var movingEntityPhase = movingEntity.Phase;
+            var move = CalculateMove(movingEntity, movingEntity.MoveIntent.Value);
 
-            var shouldPreventMovement = false;
-            var shouldLoseMoveIntent = true;
-
-            if (movingEntityPhase != Phase.Immaterial)
+            if (!move.IsBlocked)
             {
-                foreach (var blockingEntityWithId in AllActiveEntitiesWithIdsAtPosition(targetPosition.Value))
-                {
-                    var blockingEntity = blockingEntityWithId.Entity;
-                    if (blockingEntity.Depth == movingEntityDepth && blockingEntity.Phase == movingEntityPhase)
-                    {
-                        // We hit something, so we won't be moving this frame (but we might retain our MoveIntent to try again next frame)
-                        shouldPreventMovement = true;
-
-                        if (!movingEntity.PushingStrength.HasValue)
-                        {
-                            continue;
-                        }
-
-                        var myPushStrength = movingEntity.PushingStrength.Value;
-                        if (!blockingEntity.RequiredStrengthToPush.HasValue)
-                        {
-                            continue;
-                        }
-
-                        var pushRequirement = blockingEntity.RequiredStrengthToPush.Value;
-
-                        if (pushRequirement > myPushStrength)
-                        {
-                            // entity is too heavy to push, give it a nudge to show that it's pushable
-                            result.Add(new SetNudgeIntentTransform(blockingEntityWithId,
-                                movingEntity.MoveIntent.Value));
-                        }
-
-                        if (pushRequirement == myPushStrength)
-                        {
-                            // entity is exactly light enough to push. we push it but also don't move
-                            result.Add(new SetMoveIntentTransform(blockingEntityWithId,
-                                movingEntity.MoveIntent.Value));
-                        }
-
-                        if (pushRequirement < myPushStrength)
-                        {
-                            // entity is very easy to push
-                            result.Add(new SetMoveIntentTransform(blockingEntityWithId,
-                                movingEntity.MoveIntent.Value));
-                            shouldLoseMoveIntent = false;
-                        }
-                    }
-                }
-            }
-
-            if (!shouldPreventMovement)
-            {
+                // Move entity if the simulated move was not blocked
                 result.Add(new MoveEntityInCardinalDirectionTransform(movingEntityWithId.Id,
                     movingEntity.MoveIntent.Value));
             }
+            
+            // Clear own move intent
+            result.Add(new SetMoveIntentTransform(movingEntityWithId.Id, null));
 
-            if (shouldLoseMoveIntent)
+            foreach (var movedEntity in move.CascadingMoveIntents())
             {
-                result.Add(new SetMoveIntentTransform(movingEntityWithId.Id, null));
+                result.Add(new SetMoveIntentTransform(movedEntity.Id, movedEntity.Direction));
+            }
+
+            foreach (var nudgedEntity in move.NudgedEntities())
+            {
+                result.Add(new SetNudgeIntentTransform(nudgedEntity, movingEntity.MoveIntent));
             }
         }
 
         return result;
+    }
+
+    private MoveResult CalculateMove(Entity movingEntity, CardinalDirection direction)
+    {
+        var moveResult = new MoveResult();
+        
+        var movingEntityDepth = movingEntity.Depth;
+        var movingEntityPhase = movingEntity.Phase;
+        
+        if (movingEntityPhase == Phase.Immaterial)
+        {
+            return moveResult;
+        }
+
+        if (!movingEntity.Position.HasValue)
+        {
+            moveResult.Block();
+            return moveResult;
+        }
+
+        foreach (var blockingEntityWithId in
+                 AllActiveEntitiesWithIdsAtPosition(movingEntity.Position.Value + direction))
+        {
+            var blockingEntity = blockingEntityWithId.Entity;
+            if (blockingEntity.Depth == movingEntityDepth && blockingEntity.Phase == movingEntityPhase)
+            {
+                if (!movingEntity.PushingStrength.HasValue)
+                {
+                    // We cannot push (so assume we're infinitely weak)
+                    moveResult.Block();
+                    break;
+                }
+
+                var myPushStrength = movingEntity.PushingStrength.Value;
+                if (!blockingEntity.RequiredStrengthToPush.HasValue)
+                {
+                    // Blocker does not have a strength requirement (and is therefore infinitely heavy)
+                    moveResult.Block();
+                    break;
+                }
+
+                var pushRequirement = blockingEntity.RequiredStrengthToPush.Value;
+
+                if (pushRequirement > myPushStrength)
+                {
+                    // Cannot push an object this heavy. Stop moving but nudge the object to show it can be moved.
+                    moveResult.Block();
+                    moveResult.AddNudge(blockingEntityWithId);
+                }
+                else if (pushRequirement == myPushStrength)
+                {
+                    // Can push exactly this weight. We stop moving but we also push the object.
+                    moveResult.Block();
+                    moveResult.AddCascadingMoveIntent(blockingEntityWithId, direction);
+                }
+                else if (pushRequirement < myPushStrength)
+                {
+                    // Can easily push this object, if it's able to move we'll move with it.
+                    moveResult.AddCascadingMoveIntent(blockingEntityWithId, direction);
+                    var subMove = CalculateMove(blockingEntity, direction);
+                    if (subMove.IsBlocked)
+                    {
+                        moveResult.AddNudge(blockingEntityWithId);
+                        moveResult.Block();
+                    }
+                }
+            }
+        }
+
+        // todo: water -> if AvoidsFalling { return StopMoving; }
+
+        return moveResult;
     }
 
     private IEnumerable<EntityWithId> AllActiveEntitiesWithIdsAtPosition(GridPosition targetPosition)

@@ -27,6 +27,7 @@ public class BaseTests
 
     protected void ApplyAndResolve(ITransform transform)
     {
+        CurrentFrame.Log($"TEST: Running {nameof(ApplyAndResolve)}");
         ApplyTransform(transform);
         ResolveCurrentFrame();
     }

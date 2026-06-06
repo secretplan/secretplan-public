@@ -5,9 +5,9 @@ namespace SokoConsole2;
 
 public static class SimpleAssert
 {
-    public static void ShouldBe<T>(T? actual, T? expected, [CallerArgumentExpression(nameof(actual))] string actualName = "", [CallerLineNumber] int callerLineNumber = 0, [CallerFilePath] string callerFilePath = "")
+    public static void ShouldBe<T>(T? actual, T? expected, [CallerArgumentExpression(nameof(actual))] string actualName = "", [CallerLineNumber] int callerLineNumber = 0, [CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerMemberName = "")
     {
-        var caller = $"{callerFilePath}:{callerLineNumber} {actualName}";
+        var caller = $"{callerMemberName} {callerFilePath}:{callerLineNumber} {actualName}";
         
         if (actual == null)
         {

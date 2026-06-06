@@ -43,7 +43,7 @@ foreach (var type in types)
         }
         catch (TargetInvocationException e)
         {
-            Console.WriteLine(testName);
+            Console.WriteLine($"[{testName}]");
             Console.WriteLine($"FAILED: {e.InnerException?.Message}");
             failed = true;
 
