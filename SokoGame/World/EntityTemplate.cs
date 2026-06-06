@@ -88,6 +88,7 @@ public static class EntityTemplate
             Phase = Phase.Solid,
             Depth = WorldDepth.Floor,
             Density = Density.FloatsInAir,
+            BecomesHeavyWhenSteppedOff = true,
             Graphic = EntityGraphic.CreateCharacter(';', 1)
         };
     }

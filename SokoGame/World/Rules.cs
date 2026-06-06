@@ -20,12 +20,10 @@ public static class Rules
 
             if (!move.IsBlocked)
             {
-                // Move entity if the simulated move was not blocked
-                result.Add(new MoveEntityInCardinalDirectionTransform(entityId,
-                    movingEntity.MoveIntent.Value));
+                result.Add(new TransformMoveEntityInCardinalDirection(entityId, movingEntity.MoveIntent.Value));
+                result.Add(new TransformStepOff(movingEntity.Position.Value));
             }
 
-            // Clear own move intent
             result.Add(new TransformSetMoveIntent(entityId, null));
 
             foreach (var movedEntity in move.CascadingMoveIntents())

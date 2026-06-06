@@ -3,8 +3,7 @@ using SokoGame.World;
 
 namespace SokoGame.Transforms;
 
-public readonly record struct MoveEntityInCardinalDirectionTransform(EntityId EntityId, CardinalDirection Direction)
-    : ITransform
+public readonly record struct TransformMoveEntityInCardinalDirection(EntityId EntityId, CardinalDirection Direction) : ITransform
 {
     public Frame ApplyTo(Frame frame)
     {

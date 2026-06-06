@@ -163,6 +163,34 @@ public class BasicInteractionTests : BaseTests
         SimpleAssert.ShouldBe(CurrentFrame.GetEntity(player).Position, new GridPosition(2, 0));
     }
 
+    public void OneWayDoorByWayOfBrittleFloor()
+    {
+        var player = StartingFrame.AddEntity(EntityTemplate.Player(GridPosition.Zero));
+        StartingFrame.AddEntity(EntityTemplate.BrittleFloor(new GridPosition(1, 0)));
+        StartingFrame.AddEntity(EntityTemplate.Water(new GridPosition(1, 0)));
+        
+        // step on floor
+        ApplyAndResolve(new TransformSetMoveIntent(player, CardinalDirection.Right));
+        
+        
+        // player moved successfully, no hole yet!
+        SimpleAssert.ShouldBe(CurrentFrame.GetEntity(player).Position, new GridPosition(1,0));
+        SimpleAssert.ShouldBe(CurrentFrame.IsHoleAt(new GridPosition(1,0)), false);
+        
+        // step off floor, revealing water underneath
+        ApplyAndResolve(new TransformSetMoveIntent(player, CardinalDirection.Right));
+
+        // There is a hole now!
+        SimpleAssert.ShouldBe(CurrentFrame.IsHoleAt(new GridPosition(1,0)), true);
+        SimpleAssert.ShouldBe(CurrentFrame.GetEntity(player).Position, new GridPosition(2,0));
+        
+        // Attempt to move backwards
+        ApplyAndResolve(new TransformSetMoveIntent(player, CardinalDirection.Left));
+        
+        // Player was blocked by water
+        SimpleAssert.ShouldBe(CurrentFrame.GetEntity(player).Position, new GridPosition(2,0));
+    }
+
     public void MultipleObjectsMoveToSameSpotOnSameFrame()
     {
     }

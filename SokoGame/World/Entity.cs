@@ -16,4 +16,5 @@ public readonly record struct Entity(
     bool ReplacesFloor,
     WorldDepth Depth,
     Density Density,
-    EntityGraphic Graphic);
+    EntityGraphic Graphic,
+    bool BecomesHeavyWhenSteppedOff);
