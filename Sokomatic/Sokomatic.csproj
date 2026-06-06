@@ -1,0 +1,13 @@
+<Project Sdk="Godot.NET.Sdk/4.6.2">
+  <ItemGroup>
+    <ProjectReference Include="..\Packages\ExTween\ExTween.csproj" />
+    <ProjectReference Include="..\Packages\SecretPlanCore\SecretPlanCore.csproj" />
+    <ProjectReference Include="..\Packages\SecretPlanGodot\SecretPlanGodot.csproj" />
+    <ProjectReference Include="..\SokoCore\SokoCore.csproj" />
+  </ItemGroup>
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework Condition=" '$(GodotTargetPlatform)' == 'android' ">net9.0</TargetFramework>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+  </PropertyGroup>
+</Project>

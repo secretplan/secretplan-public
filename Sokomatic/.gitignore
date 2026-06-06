@@ -1,0 +1,10 @@
+# Godot 4+ specific ignores
+.godot/
+/android/
+
+# random files that appear and disappear
+~libgodotsteam*
+~steam-multiplayer-peer*
+
+# We have to setup the symlink just right on macOS and then ignore it windows :(
+addons/steam-multiplayer-peer/macos/libsteam_api.dylib

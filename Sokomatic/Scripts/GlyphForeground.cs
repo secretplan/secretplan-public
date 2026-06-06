@@ -1,0 +1,39 @@
+using Godot;
+
+namespace SokoGodot;
+
+public class GlyphForeground
+{
+    private readonly Control _foreground;
+    private readonly Label _label;
+    private readonly TextureRect _textureRect;
+
+    public GlyphForeground(Control foreground, Label label, TextureRect textureRect)
+    {
+        _foreground = foreground;
+        _label = label;
+        _textureRect = textureRect;
+    }
+
+    public void ShowNothing()
+    {
+        _label.Visible = false;
+        _textureRect.Visible = false;
+    }
+    
+    public void ShowGlyph(char character)
+    {
+        _label.Visible = true;
+        _label.Text = $"{character}";
+        
+        _textureRect.Visible = false;
+    }
+
+    public void ShowImage()
+    {
+        _textureRect.Visible = true;
+        // _textureRect.Texture = ; // todo!
+        
+        _label.Visible = false;
+    }
+}

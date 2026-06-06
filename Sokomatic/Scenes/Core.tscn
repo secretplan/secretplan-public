@@ -1,0 +1,28 @@
+[gd_scene format=3 uid="uid://dv0gevp7oif7l"]
+
+[ext_resource type="PackedScene" path="res://Scenes/Line.tscn" id="1_bow1k"]
+[ext_resource type="Script" uid="uid://dgyuqhgge43td" path="res://Scripts/Core.cs" id="1_ec8af"]
+
+[node name="Core" type="Control" unique_id=1994325132]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_ec8af")
+
+[node name="Aspect" type="AspectRatioContainer" parent="." unique_id=993539750]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Lines" type="VBoxContainer" parent="Aspect" unique_id=381926594]
+layout_mode = 2
+alignment = 1
+
+[node name="Line" parent="Aspect/Lines" unique_id=1825342079 instance=ExtResource("1_bow1k")]
+layout_mode = 2
