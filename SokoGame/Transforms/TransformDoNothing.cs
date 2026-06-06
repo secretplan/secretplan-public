@@ -2,7 +2,7 @@
 
 namespace SokoGame.Transforms;
 
-public readonly record struct DoNothingTransform : ITransform
+public readonly record struct TransformDoNothing : ITransform
 {
     public Frame ApplyTo(Frame frame)
     {

@@ -4,7 +4,7 @@ public static class TransformExtensions
 {
     public static bool IsNoOp(this ITransform transform)
     {
-        if (transform is DoNothingTransform)
+        if (transform is TransformDoNothing)
         {
             return true;
         }

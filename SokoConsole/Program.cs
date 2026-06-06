@@ -3,9 +3,10 @@ using SokoConsole2;
 
 Type[] types =
 [
-    typeof(BasicTests),
+    typeof(FrameTests),
+    typeof(BasicInteractionTests),
     typeof(EdgeCaseTests),
-    typeof(AnimationTests)
+    typeof(AnimationTests),
 ];
 
 

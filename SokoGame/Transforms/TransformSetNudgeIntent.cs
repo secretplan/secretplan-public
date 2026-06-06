@@ -3,7 +3,7 @@ using SokoGame.World;
 
 namespace SokoGame.Transforms;
 
-public readonly record struct SetNudgeIntentTransform(EntityId EntityId, CardinalDirection? DesiredMoveIntent)
+public readonly record struct TransformSetNudgeIntent(EntityId EntityId, CardinalDirection? DesiredMoveIntent)
     : ITransform
 {
     public Frame ApplyTo(Frame frame)

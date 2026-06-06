@@ -82,26 +82,26 @@ public class Frame
         };
     }
 
-    public AnimatedTransform GetResolveTransform()
+    public TransformGroupAnimated GetResolveTransform()
     {
-        return GetResolveTransform(new DoNothingTransform());
+        return GetResolveTransform(new TransformDoNothing());
     }
 
     /// <summary>
     ///     Obtains a transform that will get us to a resolved state
     /// </summary>
-    public AnimatedTransform GetResolveTransform(ITransform startingTransform)
+    public TransformGroupAnimated GetResolveTransform(ITransform startingTransform)
     {
         if (startingTransform.IsNoOp())
         {
-            Log($"Resolving from current state");
+            Log("Resolving from current state");
         }
         else
         {
             Log($"Resolving with starting transform: {startingTransform}");
         }
 
-        var transforms = new AnimatedTransform(TransformAnimationType.InSequence);
+        var transforms = new TransformGroupAnimated(TransformAnimationType.InSequence);
 
         transforms.Add(startingTransform);
         var currentFrame = CloneWithTransform(startingTransform);
@@ -154,88 +154,102 @@ public class Frame
     private ITransform GetNextTransform()
     {
         // The next transform will be the result of ONE of these functions, prioritized in this order.
-        Func<AnimatedTransform>[] functions =
-            [HandleAllMoveIntents, HandleSignalChanges, HandleHeightChanges, HandleCollisions];
+        Func<Frame, TransformGroupAnimated>[] functions =
+            [Rules.HandleAllMoveIntents, Rules.HandleSignalChanges, Rules.HandleHeightChanges, Rules.HandleCollisions];
 
         foreach (var function in functions)
         {
-            var result = function();
+            var result = function(this);
             if (!result.IsNoOp())
             {
                 return result;
             }
         }
 
-        return new DoNothingTransform();
+        return new TransformDoNothing();
     }
 
-    private AnimatedTransform HandleCollisions()
+    public IEnumerable<HoleDescription> AllHoles()
     {
-        var result = new AnimatedTransform(TransformAnimationType.AllAtOnce);
-
-        return result;
-    }
-
-    private AnimatedTransform HandleSignalChanges()
-    {
-        var result = new AnimatedTransform(TransformAnimationType.AllAtOnce);
-
-        return result;
-    }
-
-    private AnimatedTransform HandleHeightChanges()
-    {
-        var result = new AnimatedTransform(TransformAnimationType.AllAtOnce);
-
-        return result;
-    }
-
-    private AnimatedTransform HandleAllMoveIntents()
-    {
-        var result = new AnimatedTransform(TransformAnimationType.AllAtOnce);
-
-        foreach (var movingEntityWithId in AllActiveEntitiesWithIds())
+        foreach (var gridPosition in AllGridPositions())
         {
-            var movingEntity = movingEntityWithId.Entity;
-            if (!movingEntity.MoveIntent.HasValue || !movingEntity.Position.HasValue)
+            var hole = GetHoleAt(gridPosition);
+            if (hole != null)
             {
-                continue;
+                yield return hole;
+            }
+        }
+    }
+
+    public bool IsHoleAt(GridPosition gridPosition)
+    {
+        var hole = GetHoleAt(gridPosition);
+        return hole != null && hole.IsValid;
+    }
+
+    private HoleDescription? GetHoleAt(GridPosition gridPosition)
+    {
+        var entities = AllActiveEntitiesWithIdsAtPosition(gridPosition).ToList();
+        var holes = entities.Where(a => a.Entity.ReplacesFloor).ToHashSet();
+
+        if (holes.Count == 0)
+        {
+            return null;
+        }
+
+        var fillers = entities.Where(a => a.Entity.Depth == WorldDepth.Floor && a.Entity.Phase == Phase.Solid).ToList();
+
+        var filledHoles = new HashSet<EntityId>();
+        foreach (var hole in holes)
+        {
+            // Water/Lava needs to be filled by something that floats in liquid
+            if (hole.Entity.Phase == Phase.Liquid)
+            {
+                if (fillers.Any(a => a.Entity.Density <= Density.FloatsInLiquid))
+                {
+                    filledHoles.Add(hole);
+                }
             }
 
-            var move = CalculateMove(movingEntity, movingEntity.MoveIntent.Value);
-
-            if (!move.IsBlocked)
+            // Pit needs to be filled by something that floats in liquid
+            if (hole.Entity.Phase == Phase.Air)
             {
-                // Move entity if the simulated move was not blocked
-                result.Add(new MoveEntityInCardinalDirectionTransform(movingEntityWithId.Id,
-                    movingEntity.MoveIntent.Value));
-            }
-            
-            // Clear own move intent
-            result.Add(new SetMoveIntentTransform(movingEntityWithId.Id, null));
-
-            foreach (var movedEntity in move.CascadingMoveIntents())
-            {
-                result.Add(new SetMoveIntentTransform(movedEntity.Id, movedEntity.Direction));
-            }
-
-            foreach (var nudgedEntity in move.NudgedEntities())
-            {
-                result.Add(new SetNudgeIntentTransform(nudgedEntity, movingEntity.MoveIntent));
+                if (fillers.Any(a => a.Entity.Density <= Density.FloatsInAir))
+                {
+                    filledHoles.Add(hole);
+                }
             }
         }
 
-        return result;
+        holes.RemoveWhere(a => filledHoles.Contains(a.Id));
+
+        if (holes.Count == 0)
+        {
+            // all holes filled, no hole here!
+            return null;
+        }
+
+        return new HoleDescription(gridPosition, holes);
     }
 
-    private MoveResult CalculateMove(Entity movingEntity, CardinalDirection direction)
+    private IEnumerable<GridPosition> AllGridPositions()
+    {
+        return AllActiveEntitiesWithIds()
+            .Select(a => a.Entity.Position)
+            .Where(a => a.HasValue)
+            .Select(position => position!.Value)
+            .Distinct();
+    }
+
+
+    public MoveResult CalculateMove(Entity movingEntity, CardinalDirection direction)
     {
         var moveResult = new MoveResult();
-        
+
         var movingEntityDepth = movingEntity.Depth;
         var movingEntityPhase = movingEntity.Phase;
-        
-        if (movingEntityPhase == Phase.Immaterial)
+
+        if (movingEntityPhase == Phase.Air)
         {
             return moveResult;
         }
@@ -246,8 +260,8 @@ public class Frame
             return moveResult;
         }
 
-        foreach (var blockingEntityWithId in
-                 AllActiveEntitiesWithIdsAtPosition(movingEntity.Position.Value + direction))
+        var targetPosition = movingEntity.Position.Value + direction;
+        foreach (var blockingEntityWithId in AllActiveEntitiesWithIdsAtPosition(targetPosition))
         {
             var blockingEntity = blockingEntityWithId.Entity;
             if (blockingEntity.Depth == movingEntityDepth && blockingEntity.Phase == movingEntityPhase)
@@ -294,18 +308,21 @@ public class Frame
                 }
             }
         }
-
-        // todo: water -> if AvoidsFalling { return StopMoving; }
+        
+        if (movingEntity.AvoidsFalling && IsHoleAt(targetPosition))
+        {
+            moveResult.Block();
+        }
 
         return moveResult;
     }
 
-    private IEnumerable<EntityWithId> AllActiveEntitiesWithIdsAtPosition(GridPosition targetPosition)
+    public IEnumerable<EntityWithId> AllActiveEntitiesWithIdsAtPosition(GridPosition targetPosition)
     {
         return AllActiveEntitiesWithIds().Where(a => a.Entity.Position == targetPosition);
     }
 
-    private IEnumerable<EntityWithId> AllActiveEntitiesWithIds()
+    public IEnumerable<EntityWithId> AllActiveEntitiesWithIds()
     {
         foreach (var (id, entity) in Lookup)
         {

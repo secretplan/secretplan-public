@@ -67,4 +67,28 @@ public static class EntityTemplate
             Graphic = EntityGraphic.CreateCharacter('~', 1)
         };
     }
+    
+    public static Entity Pit(GridPosition gridPosition)
+    {
+        return new Entity
+        {
+            Position = gridPosition,
+            Phase = Phase.Air,
+            ReplacesFloor = true,
+            Depth = WorldDepth.Floor,
+            Graphic = EntityGraphic.CreateCharacter('~', 1)
+        };
+    }
+
+    public static Entity BrittleFloor(GridPosition gridPosition)
+    {
+        return new Entity
+        {
+            Position = gridPosition,
+            Phase = Phase.Solid,
+            Depth = WorldDepth.Floor,
+            Density = Density.FloatsInAir,
+            Graphic = EntityGraphic.CreateCharacter(';', 1)
+        };
+    }
 }
