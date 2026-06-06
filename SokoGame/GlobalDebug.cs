@@ -1,6 +1,6 @@
 ﻿namespace SokoGame;
 
-public static class Global
+public static class GlobalDebug
 {
     public static bool IsLoggingEnabled;
     public static string LoggingPrefix = "DEBUG";

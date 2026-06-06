@@ -1,4 +1,6 @@
-﻿using SokoGame.Transforms;
+﻿using System.Collections;
+using SokoCore;
+using SokoGame.Transforms;
 
 namespace SokoGame.World;
 
@@ -111,7 +113,7 @@ public class Frame
 
     private void Log(string message)
     {
-        Global.DebugLog($"{this}: {message}");
+        GlobalDebug.DebugLog($"{this}: {message}");
     }
 
     /// <summary>
@@ -159,19 +161,48 @@ public class Frame
     {
         var result = new AnimatedTransform(TransformAnimationType.AllAtOnce);
 
-        foreach (var entityWithId in AllActiveEntitiesWithIds())
+        foreach (var movingEntityWithId in AllActiveEntitiesWithIds())
         {
-            if (entityWithId.Entity.MoveIntent != null)
+            var movingEntity = movingEntityWithId.Entity;
+            if (!movingEntity.MoveIntent.HasValue || !movingEntity.Position.HasValue)
             {
-                // todo: If entity cannot move here, do not let it
-                result.Add(new MoveEntityInCardinalDirectionTransform(entityWithId.Id,
-                    entityWithId.Entity.MoveIntent.Value));
-
-                result.Add(new SetMoveIntentTransform(entityWithId.Id, null));
+                continue;
             }
+
+            var targetPosition = movingEntity.Position + movingEntity.MoveIntent.Value;
+            var movingEntityDepth = movingEntity.Depth;
+            var movingEntityPhase = movingEntity.Phase;
+
+            var shouldPreventMovement = false;
+
+            if (movingEntityPhase != Phase.Immaterial)
+            {
+                foreach (var entityAndIdAtTargetPosition in AllActiveEntitiesWithIdsAtPosition(targetPosition.Value))
+                {
+                    var entityAtPosition = entityAndIdAtTargetPosition.Entity;
+                    if (movingEntityDepth == entityAtPosition.Depth && movingEntityPhase == entityAtPosition.Phase)
+                    {
+                        shouldPreventMovement = true;
+                    }
+                }
+            }
+
+            if (!shouldPreventMovement)
+            {
+                result.Add(new MoveEntityInCardinalDirectionTransform(movingEntityWithId.Id,
+                    movingEntity.MoveIntent.Value));
+            }
+
+            // Clear move intent
+            result.Add(new SetMoveIntentTransform(movingEntityWithId.Id, null));
         }
 
         return result;
+    }
+
+    private IEnumerable<EntityWithId> AllActiveEntitiesWithIdsAtPosition(GridPosition targetPosition)
+    {
+        return AllActiveEntitiesWithIds().Where(a => a.Entity.Position == targetPosition);
     }
 
     private IEnumerable<EntityWithId> AllActiveEntitiesWithIds()

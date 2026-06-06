@@ -1,5 +1,4 @@
 using SokoCore;
-using SokoGame;
 using SokoGame.Transforms;
 using SokoGame.World;
 
@@ -9,7 +8,7 @@ public class BasicTests : BaseTests
 {
     public void PlayerMovesInEmptyVoid()
     {
-        var player = StartingFrame.AddEntity(new Entity { Position = GridPosition.Zero });
+        var player = StartingFrame.AddEntity(EntityTemplate.Player(GridPosition.Zero));
 
         ApplyAndResolve(new SetMoveIntentTransform(player, CardinalDirection.Right));
 
@@ -19,17 +18,36 @@ public class BasicTests : BaseTests
 
     public void PlayerHitsWall()
     {
-        var player = StartingFrame.AddEntity(new Entity { Position = GridPosition.Zero });
-        var wall = StartingFrame.AddEntity(new Entity { Position = new GridPosition(2, 0) });
-        
+        var player = StartingFrame.AddEntity(EntityTemplate.Player(GridPosition.Zero));
+        var wall = StartingFrame.AddEntity(EntityTemplate.Wall(new GridPosition(2, 0)));
+
         ApplyAndResolve(new SetMoveIntentTransform(player, CardinalDirection.Right));
         ApplyAndResolve(new SetMoveIntentTransform(player, CardinalDirection.Right));
-        
+
         SimpleAssert.ShouldBe(CurrentFrame.GetEntity(player).Position, new GridPosition(1, 0));
     }
 
     public void PlayerPushesCrate()
     {
+        var player = StartingFrame.AddEntity(EntityTemplate.Player(GridPosition.Zero));
+        var crate = StartingFrame.AddEntity(EntityTemplate.Crate(new GridPosition(1, 0)));
+
+        ApplyAndResolve(new SetMoveIntentTransform(player, CardinalDirection.Right));
+
+        // crate has moved, player has not
+        SimpleAssert.ShouldBe(CurrentFrame.GetEntity(player).Position, new GridPosition(1, 0));
+        SimpleAssert.ShouldBe(CurrentFrame.GetEntity(crate).Position, new GridPosition(2, 0));
+
+        ApplyAndResolve(new SetMoveIntentTransform(player, CardinalDirection.Right));
+
+        // player has moved into the space that crate has vacated
+        SimpleAssert.ShouldBe(CurrentFrame.GetEntity(player).Position, new GridPosition(2, 0));
+        SimpleAssert.ShouldBe(CurrentFrame.GetEntity(crate).Position, new GridPosition(2, 0));
+    }
+
+    public void PlayerPushesTwoAdjacentCrates()
+    {
+        
     }
 
     public void PlayerPushesGlass()

@@ -33,7 +33,7 @@ public class BaseTests
 
     public void EnableLogging(string prefix)
     {
-        Global.LoggingPrefix = prefix;
-        Global.IsLoggingEnabled = true;
+        GlobalDebug.LoggingPrefix = prefix;
+        GlobalDebug.IsLoggingEnabled = true;
     }
 }

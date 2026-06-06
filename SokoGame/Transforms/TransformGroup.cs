@@ -1,4 +1,5 @@
-﻿using SokoGame.World;
+﻿using System.Text;
+using SokoGame.World;
 
 namespace SokoGame.Transforms;
 
@@ -30,5 +31,15 @@ public class TransformGroup : ITransform
     public bool IsEmpty()
     {
         return _transforms.Count == 0 || _transforms.All(transform => transform.IsNoOp());
+    }
+
+    public override string ToString()
+    {
+        var stringBuilder = new StringBuilder();
+        stringBuilder.Append(GetType().Name);
+        stringBuilder.Append("[");
+        stringBuilder.Append(string.Join(", ", _transforms.Select(a => a.ToString())));
+        stringBuilder.Append("]");
+        return stringBuilder.ToString();
     }
 }
