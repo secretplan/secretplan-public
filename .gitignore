@@ -1,0 +1,12 @@
+# grubby macOS fingerprints
+.DS_Store
+
+# Any .build directory in any path
+.build
+
+# Control Room Configuration and logs
+/ControlRoomLogs
+/ControlRoomState.json
+
+# Local Directory
+/Local

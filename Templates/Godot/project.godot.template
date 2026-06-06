@@ -1,0 +1,38 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[application]
+
+config/name="%ASSEMBLY_NAME%"
+config/use_custom_user_dir=true
+config/custom_user_dir_name="SecretPlan/%ASSEMBLY_NAME%"
+boot_splash/bg_color=Color(0.07551005, 0.07551014, 0.07551011, 1)
+boot_splash/fullsize=false
+
+[display]
+
+window/size/viewport_width=1920
+window/size/viewport_height=1080
+
+[dotnet]
+
+project/assembly_name="%ASSEMBLY_NAME%"
+
+[rendering]
+
+textures/vram_compression/import_etc2_astc=true
+environment/defaults/default_clear_color=Color(0.6941205, 0.6941206, 0.69412035, 1)
+occlusion_culling/use_occlusion_culling=true
+
+[steam]
+
+initialization/app_id=0
+initialization/initialize_on_startup=false
+initialization/embed_callbacks=false

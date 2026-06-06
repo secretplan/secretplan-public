@@ -1,0 +1,45 @@
+﻿using ControlRoom.Core;
+
+namespace ControlRoom.Programs;
+
+public abstract class ProgramGodot : ProgramFromShortcut
+{
+    public ProgramGodot(string shortcut, string? workingDirectory = null) : base(shortcut, workingDirectory, null)
+    {
+    }
+
+    public async Task RunPresetBuild(string projectDirectory, string exeNameWithoutExtension, BuildTarget buildTarget)
+    {
+        var outputDirectory = GetOutputDirectoryForProject(projectDirectory, buildTarget);
+
+        if (outputDirectory.Exists)
+        {
+            await OutPipe.AgentLogMessage($"Clearing {outputDirectory.FullName} before we start build.");
+
+            try
+            {
+                outputDirectory.Delete(true);
+            }
+            catch (Exception e)
+            {
+                await OutPipe.AgentLogWarning($"Could not fully clear {outputDirectory}: {e}");
+            }
+        }
+
+        await OutPipe.AgentLogMessage($"Creating {outputDirectory.FullName}");
+        outputDirectory.Create();
+
+        await Run(
+            $"--headless --export-release \"{buildTarget.GodotBuildTemplateName}\" \"{Path.Join(outputDirectory.FullName, buildTarget.GetExeName(exeNameWithoutExtension))}\" --path \"{projectDirectory}\"");
+    }
+
+    public DirectoryInfo GetOutputDirectoryForProject(string projectDirectory, BuildTarget buildTarget)
+    {
+        return new DirectoryInfo(Path.Join("./", ".build", projectDirectory, buildTarget.ShortHandName));
+    }
+
+    public async Task<string> GetVersion()
+    {
+        return await RunAndGetOutput("--version");
+    }
+}

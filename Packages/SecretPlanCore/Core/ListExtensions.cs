@@ -1,0 +1,23 @@
+﻿using System.Collections;
+using System.Diagnostics.Contracts;
+
+namespace SecretPlanCore.Core;
+
+public static class ListExtensions
+{
+    [Pure]
+    public static bool IsValidIndex(this IList list, int i)
+    {
+        return i >= 0 && i < list.Count;
+    }
+
+    
+    /// <summary>
+    /// Might be dangerous for covarient arrays (object[] = new string[10])
+    /// </summary>
+    [Pure]
+    public static int ArrayIndexOf<T>(this T[] array, T element)
+    {
+        return Array.IndexOf(array, element, 0, array.Length);
+    }
+}
