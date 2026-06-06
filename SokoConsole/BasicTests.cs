@@ -35,16 +35,16 @@ public class BasicTests : BaseTests
         ApplyAndResolve(new SetMoveIntentTransform(player, CardinalDirection.Right));
 
         // crate has moved, player has not
-        SimpleAssert.ShouldBe(CurrentFrame.GetEntity(player).Position, new GridPosition(1, 0));
+        SimpleAssert.ShouldBe(CurrentFrame.GetEntity(player).Position, new GridPosition(0, 0));
         SimpleAssert.ShouldBe(CurrentFrame.GetEntity(crate).Position, new GridPosition(2, 0));
 
         ApplyAndResolve(new SetMoveIntentTransform(player, CardinalDirection.Right));
 
         // player has moved into the space that crate has vacated
-        SimpleAssert.ShouldBe(CurrentFrame.GetEntity(player).Position, new GridPosition(2, 0));
+        SimpleAssert.ShouldBe(CurrentFrame.GetEntity(player).Position, new GridPosition(1, 0));
         SimpleAssert.ShouldBe(CurrentFrame.GetEntity(crate).Position, new GridPosition(2, 0));
     }
-
+    
     public void PlayerPushesTwoAdjacentCrates()
     {
         

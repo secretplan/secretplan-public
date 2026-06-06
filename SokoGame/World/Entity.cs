@@ -11,7 +11,7 @@ public readonly record struct Entity(
     bool IsPlayerControlled,
     bool IsCameraOwner,
     bool AvoidsFalling,
-    int PushingStrength,
+    int? PushingStrength,
     int? RequiredStrengthToPush,
     bool ReplacesFloor,
     WorldDepth Depth,

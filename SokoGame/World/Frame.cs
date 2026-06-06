@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using SokoCore;
+﻿using SokoCore;
 using SokoGame.Transforms;
 
 namespace SokoGame.World;
@@ -122,7 +121,8 @@ public class Frame
     private ITransform GetNextTransform()
     {
         // The next transform will be the result of ONE of these functions, prioritized in this order.
-        Func<AnimatedTransform>[] functions = [HandleAllMoveIntents, HandleSignalChanges, HandleHeightChanges, HandleCollisions];
+        Func<AnimatedTransform>[] functions =
+            [HandleAllMoveIntents, HandleSignalChanges, HandleHeightChanges, HandleCollisions];
 
         foreach (var function in functions)
         {
@@ -174,15 +174,52 @@ public class Frame
             var movingEntityPhase = movingEntity.Phase;
 
             var shouldPreventMovement = false;
+            var shouldLoseMoveIntent = true;
 
             if (movingEntityPhase != Phase.Immaterial)
             {
-                foreach (var entityAndIdAtTargetPosition in AllActiveEntitiesWithIdsAtPosition(targetPosition.Value))
+                foreach (var blockingEntityWithId in AllActiveEntitiesWithIdsAtPosition(targetPosition.Value))
                 {
-                    var entityAtPosition = entityAndIdAtTargetPosition.Entity;
-                    if (movingEntityDepth == entityAtPosition.Depth && movingEntityPhase == entityAtPosition.Phase)
+                    var blockingEntity = blockingEntityWithId.Entity;
+                    if (blockingEntity.Depth == movingEntityDepth && blockingEntity.Phase == movingEntityPhase)
                     {
+                        // We hit something, so we won't be moving this frame (but we might retain our MoveIntent to try again next frame)
                         shouldPreventMovement = true;
+
+                        if (!movingEntity.PushingStrength.HasValue)
+                        {
+                            continue;
+                        }
+
+                        var myPushStrength = movingEntity.PushingStrength.Value;
+                        if (!blockingEntity.RequiredStrengthToPush.HasValue)
+                        {
+                            continue;
+                        }
+
+                        var pushRequirement = blockingEntity.RequiredStrengthToPush.Value;
+
+                        if (pushRequirement > myPushStrength)
+                        {
+                            // entity is too heavy to push, give it a nudge to show that it's pushable
+                            result.Add(new SetNudgeIntentTransform(blockingEntityWithId,
+                                movingEntity.MoveIntent.Value));
+                        }
+
+                        if (pushRequirement == myPushStrength)
+                        {
+                            // entity is exactly light enough to push. we push it but also don't move
+                            result.Add(new SetMoveIntentTransform(blockingEntityWithId,
+                                movingEntity.MoveIntent.Value));
+                        }
+
+                        if (pushRequirement < myPushStrength)
+                        {
+                            // entity is very easy to push, we move the entity without losing my intent (will try again next frame)
+                            result.Add(new SetMoveIntentTransform(blockingEntityWithId,
+                                movingEntity.MoveIntent.Value));
+                            shouldLoseMoveIntent = false;
+                        }
                     }
                 }
             }
@@ -193,8 +230,10 @@ public class Frame
                     movingEntity.MoveIntent.Value));
             }
 
-            // Clear move intent
-            result.Add(new SetMoveIntentTransform(movingEntityWithId.Id, null));
+            if (shouldLoseMoveIntent)
+            {
+                result.Add(new SetMoveIntentTransform(movingEntityWithId.Id, null));
+            }
         }
 
         return result;
