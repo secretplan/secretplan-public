@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
@@ -7,7 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ControlRoom", "ControlRoom.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SecretPlanCore", "..\..\Packages\SecretPlanCore\SecretPlanCore.csproj", "{A34D49C5-5044-4F8E-8525-56E616DA6D4C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BirdGameData", "..\..\Data\BirdGameData\BirdGameData.csproj", "{295BEEB6-EFD2-472E-BB57-1F1D467C4AB1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SecretPlanGodot", "..\..\Packages\SecretPlanGodot\SecretPlanGodot.csproj", "{46E94249-33A3-4827-B4BC-1A7BC2430599}"
 EndProject
@@ -88,3 +87,5 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 EndGlobal
+
+
