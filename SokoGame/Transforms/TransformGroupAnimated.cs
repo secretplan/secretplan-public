@@ -8,4 +8,9 @@ public class TransformGroupAnimated : TransformGroup
     {
         _animationType = animationType;
     }
+
+    protected override string ToStringPrefix()
+    {
+        return _animationType.ToString();
+    }
 }

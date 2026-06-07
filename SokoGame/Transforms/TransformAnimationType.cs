@@ -2,6 +2,6 @@
 
 public enum TransformAnimationType
 {
-    AllAtOnce,
-    InSequence
+    NonBlocking,
+    Blocking
 }

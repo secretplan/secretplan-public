@@ -20,16 +20,18 @@ public class BaseTests
         CurrentFrame = CurrentFrame.CloneWithTransform(transform);
     }
 
-    protected void ResolveCurrentFrame()
+    protected TransformGroupAnimated ResolveCurrentFrame()
     {
-        CurrentFrame = CurrentFrame.CloneWithTransform(CurrentFrame.GetResolveTransform());
+        var resolveTransform = CurrentFrame.GetResolveTransform();
+        CurrentFrame = CurrentFrame.CloneWithTransform(resolveTransform);
+        return resolveTransform;
     }
 
-    protected void ApplyAndResolve(ITransform transform)
+    protected TransformGroupAnimated ApplyAndResolve(ITransform transform)
     {
         CurrentFrame.Log($"TEST: Running {nameof(ApplyAndResolve)}");
         ApplyTransform(transform);
-        ResolveCurrentFrame();
+        return ResolveCurrentFrame();
     }
 
     public void EnableLogging(string prefix)

@@ -138,7 +138,7 @@ public class BasicInteractionTests : BaseTests
     public void PlayerBlockedByWater()
     {
         var player = StartingFrame.AddEntity(EntityTemplate.Player(GridPosition.Zero));
-        var water = StartingFrame.AddEntity(EntityTemplate.Water(new GridPosition(1, 0)));
+        StartingFrame.AddEntity(EntityTemplate.Water(new GridPosition(1, 0)));
 
         ApplyAndResolve(new TransformSetMoveIntent(player, CardinalDirection.Right));
 
@@ -148,8 +148,8 @@ public class BasicInteractionTests : BaseTests
     public void PushCrateIntoWaterAndWalkOnIt()
     {
         var player = StartingFrame.AddEntity(EntityTemplate.Player(GridPosition.Zero));
-        var crate = StartingFrame.AddEntity(EntityTemplate.Crate(new GridPosition(1, 0)));
-        var water = StartingFrame.AddEntity(EntityTemplate.Water(new GridPosition(2, 0)));
+        StartingFrame.AddEntity(EntityTemplate.Crate(new GridPosition(1, 0)));
+        StartingFrame.AddEntity(EntityTemplate.Water(new GridPosition(2, 0)));
 
         // Push the crate into the water
         ApplyAndResolve(new TransformSetMoveIntent(player, CardinalDirection.Right));
@@ -168,34 +168,46 @@ public class BasicInteractionTests : BaseTests
         var player = StartingFrame.AddEntity(EntityTemplate.Player(GridPosition.Zero));
         StartingFrame.AddEntity(EntityTemplate.BrittleFloor(new GridPosition(1, 0)));
         StartingFrame.AddEntity(EntityTemplate.Water(new GridPosition(1, 0)));
-        
+
         // step on floor
         ApplyAndResolve(new TransformSetMoveIntent(player, CardinalDirection.Right));
-        
-        
+
+
         // player moved successfully, no hole yet!
-        SimpleAssert.ShouldBe(CurrentFrame.GetEntity(player).Position, new GridPosition(1,0));
-        SimpleAssert.ShouldBe(CurrentFrame.IsHoleAt(new GridPosition(1,0)), false);
-        
+        SimpleAssert.ShouldBe(CurrentFrame.GetEntity(player).Position, new GridPosition(1, 0));
+        SimpleAssert.ShouldBe(CurrentFrame.IsHoleAt(new GridPosition(1, 0)), false);
+
         // step off floor, revealing water underneath
         ApplyAndResolve(new TransformSetMoveIntent(player, CardinalDirection.Right));
 
         // There is a hole now!
-        SimpleAssert.ShouldBe(CurrentFrame.IsHoleAt(new GridPosition(1,0)), true);
-        SimpleAssert.ShouldBe(CurrentFrame.GetEntity(player).Position, new GridPosition(2,0));
-        
+        SimpleAssert.ShouldBe(CurrentFrame.IsHoleAt(new GridPosition(1, 0)), true);
+        SimpleAssert.ShouldBe(CurrentFrame.GetEntity(player).Position, new GridPosition(2, 0));
+
         // Attempt to move backwards
         ApplyAndResolve(new TransformSetMoveIntent(player, CardinalDirection.Left));
-        
+
         // Player was blocked by water
-        SimpleAssert.ShouldBe(CurrentFrame.GetEntity(player).Position, new GridPosition(2,0));
+        SimpleAssert.ShouldBe(CurrentFrame.GetEntity(player).Position, new GridPosition(2, 0));
     }
 
-    public void MultipleObjectsMoveToSameSpotOnSameFrame()
+    public void PushCrateOffBrittleFloor()
     {
-    }
+        var player = StartingFrame.AddEntity(EntityTemplate.Player(GridPosition.Zero));
+        StartingFrame.AddEntity(EntityTemplate.BrittleFloor(new GridPosition(1, 0)));
+        StartingFrame.AddEntity(EntityTemplate.Water(new GridPosition(1, 0)));
+        var crate = StartingFrame.AddEntity(EntityTemplate.Crate(new GridPosition(1, 0)));
 
-    private void PrintStatus()
-    {
+        // push crate
+        ApplyAndResolve(new TransformSetMoveIntent(player, CardinalDirection.Right));
+
+        SimpleAssert.ShouldBe(CurrentFrame.GetEntity(player).Position, GridPosition.Zero);
+        SimpleAssert.ShouldBe(CurrentFrame.IsHoleAt(new GridPosition(1, 0)), true);
+        SimpleAssert.ShouldBe(CurrentFrame.GetEntity(crate).Position, new GridPosition(2, 0));
+
+        // attempting to move fails, because of the hole
+        ApplyAndResolve(new TransformSetMoveIntent(player, CardinalDirection.Right));
+
+        SimpleAssert.ShouldBe(CurrentFrame.GetEntity(player).Position, GridPosition.Zero);
     }
 }

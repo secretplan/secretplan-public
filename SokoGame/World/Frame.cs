@@ -101,7 +101,7 @@ public class Frame
             Log($"Resolving with starting transform: {startingTransform}");
         }
 
-        var transforms = new TransformGroupAnimated(TransformAnimationType.InSequence);
+        var transforms = new TransformGroupAnimated(TransformAnimationType.Blocking);
 
         transforms.Add(startingTransform);
         var currentFrame = CloneWithTransform(startingTransform);

@@ -7,16 +7,6 @@ public class TransformGroup : ITransform
 {
     private readonly List<ITransform> _transforms = new();
 
-    public void Add(ITransform transform)
-    {
-        _transforms.Add(transform);
-    }
-
-    public IEnumerable<ITransform> All()
-    {
-        return _transforms;
-    }
-
     public Frame ApplyTo(Frame frame)
     {
         var result = frame;
@@ -28,6 +18,16 @@ public class TransformGroup : ITransform
         return result;
     }
 
+    public void Add(ITransform transform)
+    {
+        _transforms.Add(transform);
+    }
+
+    public IEnumerable<ITransform> All()
+    {
+        return _transforms;
+    }
+
     public bool IsEmptyOrNoOp()
     {
         return _transforms.Count == 0 || _transforms.All(transform => transform.IsNoOp());
@@ -36,10 +36,15 @@ public class TransformGroup : ITransform
     public override string ToString()
     {
         var stringBuilder = new StringBuilder();
-        stringBuilder.Append(GetType().Name);
+        stringBuilder.Append(ToStringPrefix());
         stringBuilder.Append("[");
         stringBuilder.Append(string.Join(", ", _transforms.Select(a => a.ToString())));
         stringBuilder.Append("]");
         return stringBuilder.ToString();
+    }
+
+    protected virtual string ToStringPrefix()
+    {
+        return GetType().Name;
     }
 }

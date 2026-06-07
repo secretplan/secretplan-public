@@ -1,13 +1,8 @@
 ﻿using System.Reflection;
+using SecretPlanCore.Core;
 using SokoConsole2;
 
-Type[] types =
-[
-    typeof(FrameTests),
-    typeof(BasicInteractionTests),
-    typeof(EdgeCaseTests),
-    typeof(AnimationTests),
-];
+var types = Reflection.GetAllTypesThatDeriveFrom<BaseTests>();
 
 
 var testRunCount = 0;

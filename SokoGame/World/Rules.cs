@@ -7,9 +7,9 @@ public static class Rules
 {
     public static TransformGroupAnimated HandleAllMoveIntents(Frame frame)
     {
-        var result = new TransformGroupAnimated(TransformAnimationType.AllAtOnce);
+        var result = new TransformGroupAnimated(TransformAnimationType.NonBlocking);
 
-        foreach (var (entityId, movingEntity, _) in frame.AllActiveEntitiesWithIds())
+        foreach (var (movingEntityId, movingEntity, _) in frame.AllActiveEntitiesWithIds())
         {
             if (!movingEntity.MoveIntent.HasValue || !movingEntity.Position.HasValue)
             {
@@ -20,15 +20,19 @@ public static class Rules
 
             if (!move.IsBlocked)
             {
-                result.Add(new TransformMoveEntityInCardinalDirection(entityId, movingEntity.MoveIntent.Value));
+                result.Add(new TransformMoveEntityInCardinalDirection(movingEntityId, movingEntity.MoveIntent.Value));
                 result.Add(new TransformStepOff(movingEntity.Position.Value));
             }
-
-            result.Add(new TransformSetMoveIntent(entityId, null));
-
-            foreach (var movedEntity in move.CascadingMoveIntents())
+            else
             {
-                result.Add(new TransformSetMoveIntent(movedEntity.Id, movedEntity.Direction));
+                result.Add(new TransformSetNudgeIntent(movingEntityId, movingEntity.MoveIntent.Value));
+            }
+
+            result.Add(new TransformSetMoveIntent(movingEntityId, null));
+
+            foreach (var cascadingMove in move.CascadingMoveIntents())
+            {
+                result.Add(new TransformSetMoveIntent(cascadingMove.Id, cascadingMove.Direction));
             }
 
             foreach (var nudgedEntity in move.NudgedEntities())
@@ -42,21 +46,21 @@ public static class Rules
     
     public static TransformGroupAnimated HandleCollisions(Frame frame)
     {
-        var result = new TransformGroupAnimated(TransformAnimationType.AllAtOnce);
+        var result = new TransformGroupAnimated(TransformAnimationType.Blocking);
 
         return result;
     }
 
     public static TransformGroupAnimated HandleSignalChanges(Frame frame)
     {
-        var result = new TransformGroupAnimated(TransformAnimationType.AllAtOnce);
+        var result = new TransformGroupAnimated(TransformAnimationType.NonBlocking);
 
         return result;
     }
 
     public static TransformGroupAnimated HandleHeightChanges(Frame frame)
     {
-        var result = new TransformGroupAnimated(TransformAnimationType.AllAtOnce);
+        var result = new TransformGroupAnimated(TransformAnimationType.Blocking);
 
         foreach (var hole in frame.AllHoles())
         {
