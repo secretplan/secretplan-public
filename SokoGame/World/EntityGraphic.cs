@@ -4,7 +4,8 @@ public readonly record struct EntityGraphic(
     EntityGraphic.GraphicMode Mode,
     char Character,
     ImagePageIndex ImagePageIndex,
-    int LayerIndex)
+    int LayerIndex,
+    string? Color)
 {
     public enum GraphicMode
     {
@@ -18,23 +19,25 @@ public readonly record struct EntityGraphic(
         Clear = 3
     }
 
-    public static EntityGraphic CreateCharacter(char character, int layerIndex)
+    public static EntityGraphic CreateCharacter(char character, int layerIndex, string color)
     {
         return new EntityGraphic
         {
             Mode = GraphicMode.Character,
             Character = character,
-            LayerIndex = layerIndex
+            LayerIndex = layerIndex,
+            Color = color,
         };
     }
 
-    public static EntityGraphic CreateImage(ImagePageIndex imagePageIndex, int layerIndex)
+    public static EntityGraphic CreateImage(ImagePageIndex imagePageIndex, int layerIndex, string color)
     {
         return new EntityGraphic
         {
             Mode = GraphicMode.Sprite,
             ImagePageIndex = imagePageIndex,
-            LayerIndex = layerIndex
+            LayerIndex = layerIndex,
+            Color = color
         };
     }
 }

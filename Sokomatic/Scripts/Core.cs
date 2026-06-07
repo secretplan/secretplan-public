@@ -20,6 +20,7 @@ public partial class Core : Node
     private readonly CachedNode<Control> _screen = new("Aspect/Lines");
     private readonly Dictionary<GridPosition, AsciiGlyph> _screenPositionToGlyph = new();
     private readonly SpriteLookup _spriteLookup = new();
+    private readonly Dictionary<string, string?> _colorTable = new();
 
     private Frame _currentFrame = new(new FrameIdSource());
 
@@ -29,11 +30,25 @@ public partial class Core : Node
     {
         InitializeScreen(16, 9);
 
-        var atlasText = GameConstants.ReadTextResourceFile("res://Art/FullAtlas.json");
-        var asepriteAtlas = JsonConvert.DeserializeObject<AsepriteSheetData>(atlasText);
+        var readColorTable = JsonConvert.DeserializeObject<Dictionary<string, string>>(
+            GameConstants.ReadTextResourceFile("res://Art/Colors.json"));
+
+        if (readColorTable == null)
+        {
+            throw new Exception("Failed to read Colors.json");
+        }
+
+        foreach (var (key, value) in readColorTable)
+        {
+            _colorTable.Add(key, value);
+        }
+
+        var asepriteAtlas =
+            JsonConvert.DeserializeObject<AsepriteSheetData>(
+                GameConstants.ReadTextResourceFile("res://Art/FullAtlas.json"));
         if (asepriteAtlas == null)
         {
-            throw new Exception("Could not load atlas");
+            throw new Exception("Could not load FullAtlas.json");
         }
 
         foreach (var (frameName, frame) in asepriteAtlas.Frames)
@@ -127,13 +142,23 @@ public partial class Core : Node
 
         if (graphic.Mode == EntityGraphic.GraphicMode.Character)
         {
-            glyph.Foreground.ShowGlyph(graphic.Character);
+            glyph.Foreground.ShowGlyph(graphic.Character, ReadColor(graphic.Color));
         }
 
         if (graphic.Mode == EntityGraphic.GraphicMode.Sprite)
         {
-            glyph.Foreground.ShowImage(_spriteLookup.Get(graphic.ImagePageIndex));
+            glyph.Foreground.ShowImage(_spriteLookup.Get(graphic.ImagePageIndex), ReadColor(graphic.Color));
         }
+    }
+
+    private Color ReadColor(string? colorNameOrHex)
+    {
+        if (colorNameOrHex == null)
+        {
+            return Colors.White;
+        }
+
+        return Color.FromHtml(_colorTable.GetValueOrDefault(colorNameOrHex, colorNameOrHex));
     }
 
     public override void _Process(double delta)
@@ -209,12 +234,12 @@ public partial class Core : Node
         }
     }
 
-    public void DrawOneLineString(GridPosition screenPosition, string text)
+    public void DrawOneLineString(GridPosition screenPosition, string text, Color color)
     {
         var writePosition = screenPosition;
         for (var i = 0; i < text.Length; i++)
         {
-            GetGlyphAt(writePosition)?.Foreground.ShowGlyph(text[i]);
+            GetGlyphAt(writePosition)?.Foreground.ShowGlyph(text[i], color);
             writePosition += new Offset(1, 0);
         }
     }
