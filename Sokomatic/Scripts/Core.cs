@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Godot;
 using Newtonsoft.Json;
 using SecretPlanCore.Core;
@@ -100,7 +101,10 @@ public partial class Core : Node
     {
         ClearScreen();
 
-        foreach (var entityWithId in _gameSession.CurrentFrame.AllActiveEntitiesWithIds())
+        var allEntities = _gameSession.CurrentFrame.AllActiveEntitiesWithIds().ToList();
+        allEntities.Sort((entityA, entityB) =>
+            entityA.Entity.Graphic.LayerIndex.CompareTo(entityB.Entity.Graphic.LayerIndex));
+        foreach (var entityWithId in allEntities)
         {
             var entity = entityWithId.Entity;
             if (entity.Position.HasValue)

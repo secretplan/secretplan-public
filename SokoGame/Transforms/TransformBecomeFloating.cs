@@ -6,7 +6,8 @@ public readonly record struct TransformBecomeFloating(EntityId EntityId) : ITran
 {
     public Frame ApplyTo(Frame frame)
     {
-        // technically a no-op, animation system will use this to play a sound and set the object to a sinking animation
+        var entity = frame.GetEntity(EntityId);
+        frame.SetEntity(EntityId, entity with {Graphic = entity.Graphic with {Animation = EntityContinuousAnimation.Submerged}});
         return frame;
     }
 

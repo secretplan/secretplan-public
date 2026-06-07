@@ -50,6 +50,11 @@ public class EntityAnimationState
             };
             SecondaryColorPercent = MathF.Cos(RandomFloat(1) + _elapsedTime * 4f) / 2f + 0.5f;
         }
+        
+        if (CurrentAnimation == EntityContinuousAnimation.Submerged)
+        {
+            AngleDegrees = MathF.Sin(RandomFloat(0) + _elapsedTime) * 5f;
+        }
     }
 
     private float RandomFloat(int position)
