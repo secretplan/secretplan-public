@@ -1,3 +1,3 @@
 ﻿namespace SokoGame.World;
 
-public readonly record struct ImagePageIndex(ImagePage Page, uint Index);
+public readonly record struct ImagePageIndex(ImagePage Page, int Index);

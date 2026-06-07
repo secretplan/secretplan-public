@@ -29,10 +29,10 @@ public class GlyphForeground
         _textureRect.Visible = false;
     }
 
-    public void ShowImage()
+    public void ShowImage(Texture2D? texture)
     {
         _textureRect.Visible = true;
-        // _textureRect.Texture = ; // todo!
+        _textureRect.Texture = texture;
         
         _label.Visible = false;
     }

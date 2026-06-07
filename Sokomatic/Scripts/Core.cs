@@ -14,41 +14,79 @@ namespace SokoGodot;
 public partial class Core : Node
 {
     private readonly CachedNode<AspectRatioContainer> _aspect = new("Aspect");
-    private Frame _currentFrame = new(new FrameIdSource());
     private readonly CachedPackedScene<AsciiGlyph> _glyphPrefab = new("res://Scenes/Glyph.tscn");
     private readonly CachedPackedScene<Control> _linePrefab = new("res://Scenes/Line.tscn");
     private readonly Stack<Frame> _previousFrames = new();
     private readonly CachedNode<Control> _screen = new("Aspect/Lines");
     private readonly Dictionary<GridPosition, AsciiGlyph> _screenPositionToGlyph = new();
+    private readonly SpriteLookup _spriteLookup = new();
 
-    private readonly CachedResource<Texture2D> _textureAtlas = new("res://Art/atlas.png");
-    
+    private Frame _currentFrame = new(new FrameIdSource());
+
     private Control Screen => _screen.Get(this);
 
     public override void _Ready()
     {
         InitializeScreen(16, 9);
 
-        var atlasText = GameConstants.ReadTextResourceFile("res://Art/atlas.json");
+        var atlasText = GameConstants.ReadTextResourceFile("res://Art/FullAtlas.json");
         var asepriteAtlas = JsonConvert.DeserializeObject<AsepriteSheetData>(atlasText);
         if (asepriteAtlas == null)
         {
             throw new Exception("Could not load atlas");
         }
-        
+
         foreach (var (frameName, frame) in asepriteAtlas.Frames)
         {
             var key = frameName.RemoveFileExtension();
-            LocalClient.Print(key);
-            
+
+            if (key.StartsWith("ControllerButtons"))
+            {
+                _spriteLookup.Add(ImagePage.ControllerButtons, frame);
+            }
+
+            if (key.StartsWith("Entities"))
+            {
+                _spriteLookup.Add(ImagePage.Entities, frame);
+            }
+
+            if (key.StartsWith("Floors"))
+            {
+                _spriteLookup.Add(ImagePage.Floors, frame);
+            }
+
+            if (key.StartsWith("PopupFrame"))
+            {
+                _spriteLookup.Add(ImagePage.PopupFrame, frame);
+            }
+
+            if (key.StartsWith("Tools"))
+            {
+                _spriteLookup.Add(ImagePage.Tools, frame);
+            }
+
+            if (key.StartsWith("Utility"))
+            {
+                _spriteLookup.Add(ImagePage.Utility, frame);
+            }
+
+            if (key.StartsWith("Walls"))
+            {
+                _spriteLookup.Add(ImagePage.Walls, frame);
+            }
         }
-        
+
         _currentFrame.AddEntity(EntityTemplate.Player(new GridPosition(2, 2)));
         _currentFrame.AddEntity(EntityTemplate.Crate(new GridPosition(3, 2)));
         _currentFrame.AddEntity(EntityTemplate.GlassLightCrate(new GridPosition(3, 3)));
         _currentFrame.AddEntity(EntityTemplate.GlassLightCrate(new GridPosition(4, 3)));
 
         DrawCurrentFrame();
+    }
+
+    public override void _ExitTree()
+    {
+        _spriteLookup.Clear();
     }
 
     private void DrawCurrentFrame()
@@ -94,7 +132,7 @@ public partial class Core : Node
 
         if (graphic.Mode == EntityGraphic.GraphicMode.Sprite)
         {
-            // todo!
+            glyph.Foreground.ShowImage(_spriteLookup.Get(graphic.ImagePageIndex));
         }
     }
 
