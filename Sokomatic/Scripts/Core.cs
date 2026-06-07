@@ -1,8 +1,13 @@
+using System;
 using System.Collections.Generic;
 using Godot;
+using Newtonsoft.Json;
+using SecretPlanCore.Core;
 using SecretPlanGodot.Core;
 using SokoCore;
 using SokoGame.World;
+using Sokomatic;
+using Sokomatic.Aseprite;
 
 namespace SokoGodot;
 
@@ -16,14 +21,29 @@ public partial class Core : Node
     private readonly CachedNode<Control> _screen = new("Aspect/Lines");
     private readonly Dictionary<GridPosition, AsciiGlyph> _screenPositionToGlyph = new();
 
+    private readonly CachedResource<Texture2D> _textureAtlas = new("res://Art/atlas.png");
+    
     private Control Screen => _screen.Get(this);
 
     public override void _Ready()
     {
         InitializeScreen(16, 9);
 
+        var atlasText = GameConstants.ReadTextResourceFile("res://Art/atlas.json");
+        var asepriteAtlas = JsonConvert.DeserializeObject<AsepriteSheetData>(atlasText);
+        if (asepriteAtlas == null)
+        {
+            throw new Exception("Could not load atlas");
+        }
+        
+        foreach (var (frameName, frame) in asepriteAtlas.Frames)
+        {
+            var key = frameName.RemoveFileExtension();
+            LocalClient.Print(key);
+            
+        }
+        
         _currentFrame.AddEntity(EntityTemplate.Player(new GridPosition(2, 2)));
-
         _currentFrame.AddEntity(EntityTemplate.Crate(new GridPosition(3, 2)));
         _currentFrame.AddEntity(EntityTemplate.GlassLightCrate(new GridPosition(3, 3)));
         _currentFrame.AddEntity(EntityTemplate.GlassLightCrate(new GridPosition(4, 3)));

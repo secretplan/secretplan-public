@@ -3,7 +3,7 @@
 public readonly record struct EntityGraphic(
     EntityGraphic.GraphicMode Mode,
     char Character,
-    ImageIndex ImageIndex,
+    ImagePageIndex ImagePageIndex,
     int LayerIndex)
 {
     public enum GraphicMode
@@ -28,12 +28,12 @@ public readonly record struct EntityGraphic(
         };
     }
 
-    public static EntityGraphic CreateImage(ImageIndex imageIndex, int layerIndex)
+    public static EntityGraphic CreateImage(ImagePageIndex imagePageIndex, int layerIndex)
     {
         return new EntityGraphic
         {
             Mode = GraphicMode.Sprite,
-            ImageIndex = imageIndex,
+            ImagePageIndex = imagePageIndex,
             LayerIndex = layerIndex
         };
     }
