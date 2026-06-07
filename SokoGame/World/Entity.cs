@@ -7,6 +7,7 @@ public readonly record struct Entity(
     GridPosition? Position,
     CardinalDirection? FacingDirection,
     CardinalDirection? MoveIntent,
+    CardinalDirection? NudgeIntent,
     Phase Phase,
     bool IsPlayerControlled,
     bool IsCameraOwner,

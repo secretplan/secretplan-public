@@ -1,5 +1,6 @@
 using Godot;
 using SecretPlanGodot.Core;
+using SokoGame.Animation;
 
 namespace Sokomatic;
 

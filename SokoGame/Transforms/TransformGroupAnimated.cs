@@ -2,15 +2,15 @@
 
 public class TransformGroupAnimated : TransformGroup
 {
-    private readonly TransformAnimationType _animationType;
+    public TransformAnimationType AnimationType { get; }
 
     public TransformGroupAnimated(TransformAnimationType animationType)
     {
-        _animationType = animationType;
+        AnimationType = animationType;
     }
 
     protected override string ToStringPrefix()
     {
-        return _animationType.ToString();
+        return AnimationType.ToString();
     }
 }

@@ -1,4 +1,6 @@
-﻿using SokoCore;
+﻿using ExTween;
+using SokoCore;
+using SokoGame.Animation;
 using SokoGame.World;
 
 namespace SokoGame.Transforms;
@@ -11,6 +13,10 @@ public readonly record struct TransformSetMoveIntent(EntityId EntityId, Cardinal
         var entity = frame.GetEntity(EntityId);
         frame.SetEntity(EntityId, entity with { MoveIntent = DesiredMoveIntent });
         return frame;
+    }
+
+    public void BuildAnimation(MultiplexTween tween, EntityViewTable table)
+    {
     }
 
     public override string ToString()

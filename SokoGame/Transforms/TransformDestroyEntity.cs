@@ -1,4 +1,6 @@
-﻿using SokoGame.World;
+﻿using ExTween;
+using SokoGame.Animation;
+using SokoGame.World;
 
 namespace SokoGame.Transforms;
 
@@ -9,6 +11,10 @@ public readonly record struct TransformDestroyEntity(EntityId EntityId) : ITrans
         var entity = frame.GetEntity(EntityId);
         frame.SetEntity(EntityId, entity with { IsActive = false });
         return frame;
+    }
+
+    public void BuildAnimation(MultiplexTween tween, EntityViewTable table)
+    {
     }
 
     public override string ToString()

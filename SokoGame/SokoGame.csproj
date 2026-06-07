@@ -7,7 +7,9 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Packages\ExTween\ExTween.csproj" />
       <ProjectReference Include="..\Packages\SecretPlanCore\SecretPlanCore.csproj" />
+      <ProjectReference Include="..\Packages\SecretPlanGodot\SecretPlanGodot.csproj" />
       <ProjectReference Include="..\SokoCore\SokoCore.csproj" />
     </ItemGroup>
 

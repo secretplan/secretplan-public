@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using SecretPlanCore.Core;
 using SecretPlanGodot.Core;
 using SokoCore;
+using SokoGame.Animation;
 using SokoGame.World;
 using Sokomatic.Aseprite;
 

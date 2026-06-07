@@ -1,4 +1,6 @@
 ﻿using System.Text;
+using ExTween;
+using SokoGame.Animation;
 using SokoGame.World;
 
 namespace SokoGame.Transforms;
@@ -16,6 +18,14 @@ public class TransformGroup : ITransform
         }
 
         return result;
+    }
+
+    public void BuildAnimation(MultiplexTween tween, EntityViewTable table)
+    {
+        foreach (var transform in _transforms)
+        {
+            transform.BuildAnimation(tween, table);
+        }
     }
 
     public void Add(ITransform transform)

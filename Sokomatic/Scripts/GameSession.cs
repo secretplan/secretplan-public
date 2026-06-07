@@ -1,14 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using ExTween;
 using SecretPlanGodot.Core;
 using SokoCore;
+using SokoGame.Animation;
+using SokoGame.Transforms;
 using SokoGame.World;
 
 namespace Sokomatic;
 
 public class GameSession
 {
-    private readonly Dictionary<EntityId, EntityAnimationState> _animationTable = new();
+    private readonly EntityViewTable _viewTable = new();
+    private readonly SequenceTween _tween = new();
     private readonly FrameIdSource _frameIdSource = new();
     private readonly Stack<Frame> _previousFrames = new();
     private Frame? _checkpointFrame;
@@ -26,6 +30,7 @@ public class GameSession
         CurrentFrame.AddEntity(EntityTemplate.Water(new GridPosition(6, 2)));
         CurrentFrame.AddEntity(EntityTemplate.Water(new GridPosition(5, 3)));
         CurrentFrame.AddEntity(EntityTemplate.Water(new GridPosition(6, 3)));
+        CurrentFrame.AddEntity(EntityTemplate.Pit(new GridPosition(7, 3)));
 
         SaveCheckpoint();
         ResolveFrame();
@@ -56,7 +61,38 @@ public class GameSession
     {
         _previousFrames.Push(CurrentFrame);
         var resolveTransform = CurrentFrame.GetResolveTransform();
-        LocalClient.Print(resolveTransform);
+        LocalClient.Print("-- MOVE --");
+        _tween.Clear();
+
+        var currentMultiplex = new MultiplexTween();
+
+        foreach (var transform in resolveTransform.All())
+        {
+            if (transform is not TransformGroupAnimated animated)
+            {
+                continue;
+            }
+
+            if (transform.IsNoOp())
+            {
+                continue;
+            }
+            
+            if (animated.AnimationType == TransformAnimationType.Blocking)
+            {
+                _tween.Add(currentMultiplex);
+                currentMultiplex = new MultiplexTween();
+            }
+
+            transform.BuildAnimation(currentMultiplex, _viewTable);
+            
+            LocalClient.Print(transform);
+        }
+        
+        _tween.Add(currentMultiplex);
+
+        LocalClient.Print("-- /MOVE --");
+
         CurrentFrame = CurrentFrame.CloneWithTransform(resolveTransform);
     }
 
@@ -98,7 +134,9 @@ public class GameSession
 
     public void UpdateAnimationStates(float dt)
     {
-        foreach (var animationState in _animationTable.Values)
+        _tween.UpdateAndClearIfDone(dt);
+
+        foreach (var animationState in _viewTable.Values())
         {
             animationState.UpdateAnimation(dt);
         }
@@ -106,12 +144,6 @@ public class GameSession
 
     public EntityAnimationState GetAnimationState(EntityId id)
     {
-        if (!_animationTable.ContainsKey(id))
-        {
-            LocalClient.Print($"Added animation state: {id}");
-            _animationTable[id] = new EntityAnimationState();
-        }
-
-        return _animationTable[id];
+        return _viewTable.GetEntity(id);
     }
 }

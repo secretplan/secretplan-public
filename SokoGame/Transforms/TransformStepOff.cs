@@ -1,4 +1,6 @@
-﻿using SokoCore;
+﻿using ExTween;
+using SokoCore;
+using SokoGame.Animation;
 using SokoGame.World;
 
 namespace SokoGame.Transforms;
@@ -17,6 +19,10 @@ public readonly record struct TransformStepOff(GridPosition Position) : ITransfo
         }
 
         return frame;
+    }
+
+    public void BuildAnimation(MultiplexTween tween, EntityViewTable table)
+    {
     }
 
     public override string ToString()
