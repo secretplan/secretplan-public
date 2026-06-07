@@ -10,7 +10,12 @@ public readonly record struct EntityGraphic(
     {
         Skip = 0,
         Character = 1,
-        Image = 2
+        Sprite = 2,
+
+        /// <summary>
+        ///     Intentionally un-draws whatever is at this location
+        /// </summary>
+        Clear = 3
     }
 
     public static EntityGraphic CreateCharacter(char character, int layerIndex)
@@ -27,7 +32,7 @@ public readonly record struct EntityGraphic(
     {
         return new EntityGraphic
         {
-            Mode = GraphicMode.Image,
+            Mode = GraphicMode.Sprite,
             ImageIndex = imageIndex,
             LayerIndex = layerIndex
         };

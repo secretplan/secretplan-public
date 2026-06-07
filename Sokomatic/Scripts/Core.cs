@@ -2,14 +2,17 @@ using System.Collections.Generic;
 using Godot;
 using SecretPlanGodot.Core;
 using SokoCore;
+using SokoGame.World;
 
 namespace SokoGodot;
 
 public partial class Core : Node
 {
     private readonly CachedNode<AspectRatioContainer> _aspect = new("Aspect");
+    private Frame _currentFrame = new(new FrameIdSource());
     private readonly CachedPackedScene<AsciiGlyph> _glyphPrefab = new("res://Scenes/Glyph.tscn");
     private readonly CachedPackedScene<Control> _linePrefab = new("res://Scenes/Line.tscn");
+    private readonly Stack<Frame> _previousFrames = new();
     private readonly CachedNode<Control> _screen = new("Aspect/Lines");
     private readonly Dictionary<GridPosition, AsciiGlyph> _screenPositionToGlyph = new();
 
@@ -18,26 +21,28 @@ public partial class Core : Node
     public override void _Ready()
     {
         InitializeScreen(16, 9);
-        
-        // _universe.CurrentFrame.AddEntity(EntityTemplates.Crate(new GridPosition(3, 2)));
-        // _universe.CurrentFrame.AddEntity(EntityTemplates.GlassLightCrate(new GridPosition(3, 3)));
-        // _universe.CurrentFrame.AddEntity(EntityTemplates.GlassLightCrate(new GridPosition(4, 3)));
 
-        DrawCurrentUniverse();
+        _currentFrame.AddEntity(EntityTemplate.Player(new GridPosition(2, 2)));
+
+        _currentFrame.AddEntity(EntityTemplate.Crate(new GridPosition(3, 2)));
+        _currentFrame.AddEntity(EntityTemplate.GlassLightCrate(new GridPosition(3, 3)));
+        _currentFrame.AddEntity(EntityTemplate.GlassLightCrate(new GridPosition(4, 3)));
+
+        DrawCurrentFrame();
     }
 
-    private void DrawCurrentUniverse()
+    private void DrawCurrentFrame()
     {
         ClearScreen();
 
-        // foreach (var entityId in _universe.CurrentFrame.AllExistingEntities())
-        // {
-        //     var entity = _universe.CurrentFrame.GetEntity(entityId);
-        //     if (entity.Position.HasValue)
-        //     {
-        //         PutGraphicAt(entity.Position.Value, entity.Graphic);
-        //     }
-        // }
+        foreach (var entityWithId in _currentFrame.AllActiveEntitiesWithIds())
+        {
+            var entity = entityWithId.Entity;
+            if (entity.Position.HasValue)
+            {
+                PutGraphicAt(entity.Position.Value, entity.Graphic);
+            }
+        }
     }
 
     private void ClearScreen()
@@ -48,35 +53,34 @@ public partial class Core : Node
         }
     }
 
-    // private void PutGraphicAt(GridPosition position, EntityGraphic graphic)
-    // {
-    //     if (graphic.GraphicType == EntityGraphic.GraphicTypeEnum.Invisible)
-    //     {
-    //         return;
-    //     }
-    //
-    //     var glyph = GetGlyphAt(position);
-    //
-    //     if (glyph == null)
-    //     {
-    //         return;
-    //     }
-    //
-    //     if (graphic.GraphicType == EntityGraphic.GraphicTypeEnum.Character)
-    //     {
-    //         glyph.Foreground.ShowGlyph(graphic.Character);
-    //     }
-    //
-    //     if (graphic.GraphicType == EntityGraphic.GraphicTypeEnum.SpriteFrame)
-    //     {
-    //         // todo!
-    //     }
-    // }
+    private void PutGraphicAt(GridPosition position, EntityGraphic graphic)
+    {
+        if (graphic.Mode == EntityGraphic.GraphicMode.Skip)
+        {
+            return;
+        }
+
+        var glyph = GetGlyphAt(position);
+
+        if (glyph == null)
+        {
+            return;
+        }
+
+        if (graphic.Mode == EntityGraphic.GraphicMode.Character)
+        {
+            glyph.Foreground.ShowGlyph(graphic.Character);
+        }
+
+        if (graphic.Mode == EntityGraphic.GraphicMode.Sprite)
+        {
+            // todo!
+        }
+    }
 
     public override void _Process(double delta)
     {
-        // _universe.ExecuteUntilNoIntentLeft();
-        DrawCurrentUniverse();
+        DrawCurrentFrame();
     }
 
     public override void _Input(InputEvent inputEvent)
@@ -103,19 +107,31 @@ public partial class Core : Node
 
         if (inputEvent.IsActionPressed("undo"))
         {
-            // todo
+            if (_previousFrames.TryPop(out var previousFrame))
+            {
+                _currentFrame = previousFrame;
+                DrawCurrentFrame();
+            }
         }
     }
 
     private void MovePlayerControlledEntities(CardinalDirection cardinalDirection)
     {
-        // foreach (var entityId in _universe.CurrentFrame.AllExistingEntities())
-        // {
-        //     if (_universe.CurrentFrame.GetEntity(entityId).IsPlayerControlled)
-        //     {
-        //         _universe.CurrentFrame.SetMoveIntent(entityId, cardinalDirection);
-        //     }
-        // }
+        foreach (var entityWithId in _currentFrame.AllActiveEntitiesWithIds())
+        {
+            if (entityWithId.Entity.IsPlayerControlled)
+            {
+                _currentFrame.SetEntity(entityWithId.Id, entityWithId.Entity with { MoveIntent = cardinalDirection });
+            }
+        }
+
+        AdvanceFrame();
+    }
+
+    private void AdvanceFrame()
+    {
+        _previousFrames.Push(_currentFrame);
+        _currentFrame = _currentFrame.CloneAndResolve();
     }
 
     public void InitializeScreen(int glyphsPerLine, int numberOfLines)

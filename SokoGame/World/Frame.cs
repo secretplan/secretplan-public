@@ -70,6 +70,11 @@ public class Frame
     {
         return CloneWithTransform(GetResolveTransform(transform));
     }
+    
+    public Frame CloneAndResolve()
+    {
+        return CloneWithTransform(GetResolveTransform());
+    }
 
     /// <summary>
     ///     Makes a carbon-copy of this frame (with a different ID)

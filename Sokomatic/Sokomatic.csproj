@@ -4,6 +4,7 @@
     <ProjectReference Include="..\Packages\SecretPlanCore\SecretPlanCore.csproj" />
     <ProjectReference Include="..\Packages\SecretPlanGodot\SecretPlanGodot.csproj" />
     <ProjectReference Include="..\SokoCore\SokoCore.csproj" />
+    <ProjectReference Include="..\SokoGame\SokoGame.csproj" />
   </ItemGroup>
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
