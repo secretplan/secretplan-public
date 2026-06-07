@@ -20,11 +20,19 @@ public class TransformGroup : ITransform
         return result;
     }
 
-    public void BuildAnimation(MultiplexTween tween, EntityViewTable table)
+    public void BuildBeforeAnimation(MultiplexTween tween, EntityViewTable table)
     {
         foreach (var transform in _transforms)
         {
-            transform.BuildAnimation(tween, table);
+            transform.BuildBeforeAnimation(tween, table);
+        }
+    }
+    
+    public void BuildAfterAnimation(MultiplexTween tween, EntityViewTable table)
+    {
+        foreach (var transform in _transforms)
+        {
+            transform.BuildAfterAnimation(tween, table);
         }
     }
 

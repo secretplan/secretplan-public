@@ -27,7 +27,7 @@ public static class Rules
 
             if (!move.IsBlocked)
             {
-                result.Add(new TransformMoveEntityInCardinalDirection(movingEntityId, movingEntity.MoveIntent.Value));
+                result.Add(new TransformMoveCardinal(movingEntityId, movingEntity.MoveIntent.Value));
                 result.Add(new TransformStepOff(movingEntity.Position.Value));
             }
             else

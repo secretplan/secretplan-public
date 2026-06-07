@@ -11,5 +11,7 @@ public interface ITransform
     /// </summary>
     Frame ApplyTo(Frame frame);
 
-    void BuildAnimation(MultiplexTween tween, EntityViewTable table);
+    void BuildBeforeAnimation(MultiplexTween tween, EntityViewTable table);
+    
+    void BuildAfterAnimation(MultiplexTween tween, EntityViewTable table);
 }

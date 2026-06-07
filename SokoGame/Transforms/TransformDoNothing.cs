@@ -11,7 +11,11 @@ public readonly record struct TransformDoNothing : ITransform
         return frame;
     }
 
-    public void BuildAnimation(MultiplexTween tween, EntityViewTable table)
+    public void BuildBeforeAnimation(MultiplexTween tween, EntityViewTable table)
+    {
+    }
+
+    public void BuildAfterAnimation(MultiplexTween tween, EntityViewTable table)
     {
     }
 

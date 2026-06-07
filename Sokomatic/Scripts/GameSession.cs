@@ -1,36 +1,37 @@
 ﻿using System;
 using System.Collections.Generic;
 using ExTween;
+using ExTween.Tweens;
 using SecretPlanGodot.Core;
 using SokoCore;
 using SokoGame.Animation;
-using SokoGame.Transforms;
 using SokoGame.World;
 
 namespace Sokomatic;
 
 public class GameSession
 {
-    private readonly EntityViewTable _viewTable = new();
-    private readonly SequenceTween _tween = new();
     private readonly FrameIdSource _frameIdSource = new();
     private readonly Stack<Frame> _previousFrames = new();
+    private readonly SequenceTween _tween = new();
+    private readonly EntityViewTable _viewTable = new();
     private Frame? _checkpointFrame;
     private Frame _currentFrame;
+    private Frame? _pendingNextFrame;
 
     public GameSession()
     {
         _currentFrame = new Frame(_frameIdSource);
 
         CurrentFrame.AddEntity(EntityTemplate.Player(new GridPosition(2, 2)));
-        CurrentFrame.AddEntity(EntityTemplate.Crate(new GridPosition(3, 2)));
+        CurrentFrame.AddEntity(EntityTemplate.Crate(new GridPosition(8, 2)));
+        CurrentFrame.AddEntity(EntityTemplate.Crate(new GridPosition(9, 2)));
         CurrentFrame.AddEntity(EntityTemplate.GlassLightCrate(new GridPosition(3, 3)));
         CurrentFrame.AddEntity(EntityTemplate.GlassLightCrate(new GridPosition(4, 3)));
         CurrentFrame.AddEntity(EntityTemplate.Water(new GridPosition(5, 2)));
         CurrentFrame.AddEntity(EntityTemplate.Water(new GridPosition(6, 2)));
         CurrentFrame.AddEntity(EntityTemplate.Water(new GridPosition(5, 3)));
         CurrentFrame.AddEntity(EntityTemplate.Water(new GridPosition(6, 3)));
-        CurrentFrame.AddEntity(EntityTemplate.Pit(new GridPosition(7, 3)));
 
         SaveCheckpoint();
         ResolveFrame();
@@ -59,45 +60,51 @@ public class GameSession
 
     private void ResolveFrame()
     {
+        SkipTweenIfPlaying();
+        
         _previousFrames.Push(CurrentFrame);
         var resolveTransform = CurrentFrame.GetResolveTransform();
-        LocalClient.Print("-- MOVE --");
-        _tween.Clear();
-
-        var currentMultiplex = new MultiplexTween();
-
-        foreach (var transform in resolveTransform.All())
-        {
-            if (transform is not TransformGroupAnimated animated)
-            {
-                continue;
-            }
-
-            if (transform.IsNoOp())
-            {
-                continue;
-            }
-            
-            if (animated.AnimationType == TransformAnimationType.Blocking)
-            {
-                _tween.Add(currentMultiplex);
-                currentMultiplex = new MultiplexTween();
-            }
-
-            transform.BuildAnimation(currentMultiplex, _viewTable);
-            
-            LocalClient.Print(transform);
-        }
+        _pendingNextFrame = CurrentFrame.CloneWithTransform(resolveTransform);
         
-        _tween.Add(currentMultiplex);
+        LocalClient.Print("-- MOVE --");
+        foreach (var animatedTransform in resolveTransform.AllAnimated())
+        {
+            LocalClient.Print(animatedTransform);
+        }
 
         LocalClient.Print("-- /MOVE --");
 
-        CurrentFrame = CurrentFrame.CloneWithTransform(resolveTransform);
+        var currentMultiplex = new MultiplexTween();
+        
+        foreach (var animatedTransform in resolveTransform.AllAnimated())
+        {
+            animatedTransform.AppendTween(_tween, ref currentMultiplex);
+            animatedTransform.BuildBeforeAnimation(currentMultiplex, _viewTable);
+        }
+
+        _tween.Add(currentMultiplex);
+        
+        _tween.Add(new CallbackTween(() =>
+        {
+            CurrentFrame = _pendingNextFrame;
+            _pendingNextFrame = null;
+        }));
+
+        currentMultiplex = new MultiplexTween();
+        
+        foreach (var animatedTransform in resolveTransform.AllAnimated())
+        {
+            animatedTransform.AppendTween(_tween, ref currentMultiplex);
+            animatedTransform.BuildAfterAnimation(currentMultiplex, _viewTable);
+        }
+        
+        _tween.Add(currentMultiplex);
     }
 
     public void HandleDirectionalInput(CardinalDirection cardinalDirection)
     {
+        SkipTweenIfPlaying();
+        
         foreach (var entityWithId in _currentFrame.AllActiveEntitiesWithIds())
         {
             if (entityWithId.Entity.IsPlayerControlled)
@@ -109,8 +116,18 @@ public class GameSession
         ResolveFrame();
     }
 
+    private void SkipTweenIfPlaying()
+    {
+        if (!_tween.IsDone())
+        {
+            _tween.SkipToEnd();
+        }
+    }
+
     public void SoftReset()
     {
+        SkipTweenIfPlaying();
+        
         if (_checkpointFrame != null)
         {
             CurrentFrame = _checkpointFrame.Clone();

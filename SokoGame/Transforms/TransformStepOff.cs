@@ -21,7 +21,11 @@ public readonly record struct TransformStepOff(GridPosition Position) : ITransfo
         return frame;
     }
 
-    public void BuildAnimation(MultiplexTween tween, EntityViewTable table)
+    public void BuildBeforeAnimation(MultiplexTween tween, EntityViewTable table)
+    {
+    }
+
+    public void BuildAfterAnimation(MultiplexTween tween, EntityViewTable table)
     {
     }
 

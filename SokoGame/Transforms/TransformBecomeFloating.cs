@@ -14,7 +14,11 @@ public readonly record struct TransformBecomeFloating(EntityId EntityId) : ITran
         return frame;
     }
 
-    public void BuildAnimation(MultiplexTween tween, EntityViewTable table)
+    public void BuildBeforeAnimation(MultiplexTween tween, EntityViewTable table)
+    {
+    }
+
+    public void BuildAfterAnimation(MultiplexTween tween, EntityViewTable table)
     {
         tween.Add(table.GetEntity(EntityId).TweenableScale.TweenTo(0.75f, 0.15f, Ease.QuadFastSlow));
     }

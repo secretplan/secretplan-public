@@ -28,7 +28,12 @@ public class EntityAnimationState
     public TweenableVector2 TweenablePositionOffsetPercent { get; } = new();
     public TweenableFloat TweenableAngleDegrees { get; } = new();
     public TweenableFloat TweenableScale { get; } = new(1f);
-    public Color SecondaryColor { get; set; } = Colors.White;
+
+    /// <summary>
+    ///     Use CallbackSetSecondaryColor if you want to set this
+    /// </summary>
+    public Color SecondaryColor { get; private set; } = Colors.White;
+
     public TweenableFloat TweenableSecondaryColorPercent { get; } = new();
     public float SecondaryColorPercent { get; private set; }
 
@@ -52,7 +57,7 @@ public class EntityAnimationState
 
         if (CurrentAnimation == EntityContinuousAnimation.Submerged)
         {
-            AngleDegrees = MathF.Sin(RandomFloat(0) + _elapsedTime) * 5f;
+            Scale = 0.9f + MathF.Sin(RandomFloat(0) + _elapsedTime) * 0.1f;
         }
     }
 

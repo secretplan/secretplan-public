@@ -327,6 +327,14 @@ public class Frame
         return AllActiveEntitiesWithIds().Where(a => a.Entity.Position == targetPosition);
     }
 
+    public IEnumerable<EntityWithId> AllEntitiesWithIdsIncludingInactive()
+    {
+        foreach (var (id, entity) in Lookup)
+        {
+            yield return new EntityWithId(id, entity);
+        }
+    }
+    
     public IEnumerable<EntityWithId> AllActiveEntitiesWithIds()
     {
         foreach (var (id, entity) in Lookup)
