@@ -4,7 +4,7 @@ using ControlRoom.Missions;
 
 namespace ControlRoom.Programs;
 
-public class ProgramSteamCmd : ProgramFromShortcut
+public class ProgramSteamCmd : ExternalProgramFromShortcut
 {
     public ProgramSteamCmd() : base("steamcmd", null,
         "- Install Steamworks SDK: https://partner.steamgames.com/downloads/list" +

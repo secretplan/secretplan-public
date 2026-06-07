@@ -51,6 +51,8 @@ public class NewProject : Mission
 
         VersionChange.WriteVersionFile(projectDirectory, new SecretPlanVersion());
 
+        await OutPipe.AgentLogMessage("Please run Project > Tools > C# > Create C# Solution");
+
         var godot = new ProgramGodotLatest(newAssemblyName);
         await godot.Run("--editor");
 

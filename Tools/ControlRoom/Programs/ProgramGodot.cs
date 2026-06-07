@@ -2,7 +2,7 @@
 
 namespace ControlRoom.Programs;
 
-public abstract class ProgramGodot : ProgramFromShortcut
+public abstract class ProgramGodot : ExternalProgramFromShortcut
 {
     public ProgramGodot(string shortcut, string? workingDirectory = null) : base(shortcut, workingDirectory, null)
     {
