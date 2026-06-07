@@ -5,7 +5,9 @@ public readonly record struct EntityGraphic(
     char Character,
     ImagePageIndex ImagePageIndex,
     int LayerIndex,
-    string? Color)
+    string? Color,
+    string? SecondaryColor,
+    EntityContinuousAnimation Animation)
 {
     public enum GraphicMode
     {
@@ -30,14 +32,15 @@ public readonly record struct EntityGraphic(
         };
     }
 
-    public static EntityGraphic CreateImage(ImagePageIndex imagePageIndex, int layerIndex, string color)
+    public static EntityGraphic CreateImage(ImagePageIndex imagePageIndex, int layerIndex, string color, string? secondaryColor = null)
     {
         return new EntityGraphic
         {
             Mode = GraphicMode.Sprite,
             ImagePageIndex = imagePageIndex,
             LayerIndex = layerIndex,
-            Color = color
+            Color = color,
+            SecondaryColor = secondaryColor
         };
     }
 }

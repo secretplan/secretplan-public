@@ -64,7 +64,10 @@ public static class EntityTemplate
             Phase = Phase.Liquid,
             ReplacesFloor = true,
             Depth = WorldDepth.Floor,
-            Graphic = EntityGraphic.CreateImage(new ImagePageIndex(ImagePage.Walls, 15), 1, "water")
+            Graphic = EntityGraphic.CreateImage(new ImagePageIndex(ImagePage.Walls, 15), 1, "water", "water2") with
+            {
+                Animation = EntityContinuousAnimation.Water
+            }
         };
     }
 

@@ -6,6 +6,8 @@ namespace Sokomatic;
 
 public static class GameConstants
 {
+    public static NoiseBasedRng GlobalRandom { get; } = new((int)TimeUtilities.TimeNowMilliseconds());
+
     public static string ReadTextResourceFile(string path)
     {
         var fileAccess = FileAccess.Open(path, FileAccess.ModeFlags.Read);

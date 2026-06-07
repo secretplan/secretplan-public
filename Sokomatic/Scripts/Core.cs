@@ -6,42 +6,27 @@ using SecretPlanCore.Core;
 using SecretPlanGodot.Core;
 using SokoCore;
 using SokoGame.World;
-using Sokomatic;
 using Sokomatic.Aseprite;
 
-namespace SokoGodot;
+namespace Sokomatic;
 
 public partial class Core : Node
 {
     private readonly CachedNode<AspectRatioContainer> _aspect = new("Aspect");
     private readonly CachedPackedScene<AsciiGlyph> _glyphPrefab = new("res://Scenes/Glyph.tscn");
     private readonly CachedPackedScene<Control> _linePrefab = new("res://Scenes/Line.tscn");
-    private readonly Stack<Frame> _previousFrames = new();
     private readonly CachedNode<Control> _screen = new("Aspect/Lines");
     private readonly Dictionary<GridPosition, AsciiGlyph> _screenPositionToGlyph = new();
     private readonly SpriteLookup _spriteLookup = new();
-    private readonly Dictionary<string, string?> _colorTable = new();
 
-    private Frame _currentFrame = new(new FrameIdSource());
+    private GameSession _gameSession = new();
+    public CoreState CoreState { get; } = new();
 
     private Control Screen => _screen.Get(this);
 
     public override void _Ready()
     {
         InitializeScreen(16, 9);
-
-        var readColorTable = JsonConvert.DeserializeObject<Dictionary<string, string>>(
-            GameConstants.ReadTextResourceFile("res://Art/Colors.json"));
-
-        if (readColorTable == null)
-        {
-            throw new Exception("Failed to read Colors.json");
-        }
-
-        foreach (var (key, value) in readColorTable)
-        {
-            _colorTable.Add(key, value);
-        }
 
         var asepriteAtlas =
             JsonConvert.DeserializeObject<AsepriteSheetData>(
@@ -91,12 +76,19 @@ public partial class Core : Node
             }
         }
 
-        _currentFrame.AddEntity(EntityTemplate.Player(new GridPosition(2, 2)));
-        _currentFrame.AddEntity(EntityTemplate.Crate(new GridPosition(3, 2)));
-        _currentFrame.AddEntity(EntityTemplate.GlassLightCrate(new GridPosition(3, 3)));
-        _currentFrame.AddEntity(EntityTemplate.GlassLightCrate(new GridPosition(4, 3)));
+        HardReset();
 
         DrawCurrentFrame();
+    }
+
+    private void HardReset()
+    {
+        // Clear old game session
+        _gameSession.FrameChanged -= DrawCurrentFrame;
+
+        // Create new game session
+        _gameSession = new GameSession();
+        _gameSession.FrameChanged += DrawCurrentFrame;
     }
 
     public override void _ExitTree()
@@ -108,12 +100,15 @@ public partial class Core : Node
     {
         ClearScreen();
 
-        foreach (var entityWithId in _currentFrame.AllActiveEntitiesWithIds())
+        foreach (var entityWithId in _gameSession.CurrentFrame.AllActiveEntitiesWithIds())
         {
             var entity = entityWithId.Entity;
             if (entity.Position.HasValue)
             {
-                PutGraphicAt(entity.Position.Value, entity.Graphic);
+                var animationState = _gameSession.GetAnimationState(entityWithId.Id);
+                animationState.CurrentAnimation = entity.Graphic.Animation;
+                animationState.PrimaryColor = CoreState.ReadColor(entity.Graphic.Color);
+                PutGraphicAt(entity.Position.Value, entity.Graphic, animationState);
             }
         }
     }
@@ -126,7 +121,7 @@ public partial class Core : Node
         }
     }
 
-    private void PutGraphicAt(GridPosition position, EntityGraphic graphic)
+    private void PutGraphicAt(GridPosition position, EntityGraphic graphic, EntityAnimationState animationState)
     {
         if (graphic.Mode == EntityGraphic.GraphicMode.Skip)
         {
@@ -142,79 +137,69 @@ public partial class Core : Node
 
         if (graphic.Mode == EntityGraphic.GraphicMode.Character)
         {
-            glyph.Foreground.ShowGlyph(graphic.Character, ReadColor(graphic.Color));
+            glyph.Foreground.ShowGlyph(graphic.Character);
         }
 
         if (graphic.Mode == EntityGraphic.GraphicMode.Sprite)
         {
-            glyph.Foreground.ShowImage(_spriteLookup.Get(graphic.ImagePageIndex), ReadColor(graphic.Color));
-        }
-    }
-
-    private Color ReadColor(string? colorNameOrHex)
-    {
-        if (colorNameOrHex == null)
-        {
-            return Colors.White;
+            glyph.Foreground.ShowImage(_spriteLookup.Get(graphic.ImagePageIndex));
         }
 
-        return Color.FromHtml(_colorTable.GetValueOrDefault(colorNameOrHex, colorNameOrHex));
+        glyph.Foreground.SetColor(CoreState.ReadColor(graphic.Color));
+        glyph.SetAnimationState(animationState);
     }
 
     public override void _Process(double delta)
     {
-        DrawCurrentFrame();
+        _gameSession.UpdateAnimationStates((float)delta);
     }
 
     public override void _Input(InputEvent inputEvent)
     {
-        if (inputEvent.IsActionPressed("ui_right"))
+        if (inputEvent.IsActionPressed("move_right"))
         {
-            MovePlayerControlledEntities(CardinalDirection.Right);
+            _gameSession.HandleDirectionalInput(CardinalDirection.Right);
         }
 
-        if (inputEvent.IsActionPressed("ui_left"))
+        if (inputEvent.IsActionPressed("move_left"))
         {
-            MovePlayerControlledEntities(CardinalDirection.Left);
+            _gameSession.HandleDirectionalInput(CardinalDirection.Left);
         }
 
-        if (inputEvent.IsActionPressed("ui_up"))
+        if (inputEvent.IsActionPressed("move_up"))
         {
-            MovePlayerControlledEntities(CardinalDirection.Up);
+            _gameSession.HandleDirectionalInput(CardinalDirection.Up);
         }
 
-        if (inputEvent.IsActionPressed("ui_down"))
+        if (inputEvent.IsActionPressed("move_down"))
         {
-            MovePlayerControlledEntities(CardinalDirection.Down);
+            _gameSession.HandleDirectionalInput(CardinalDirection.Down);
         }
 
         if (inputEvent.IsActionPressed("undo"))
         {
-            if (_previousFrames.TryPop(out var previousFrame))
-            {
-                _currentFrame = previousFrame;
-                DrawCurrentFrame();
-            }
+            _gameSession.Undo();
         }
-    }
 
-    private void MovePlayerControlledEntities(CardinalDirection cardinalDirection)
-    {
-        foreach (var entityWithId in _currentFrame.AllActiveEntitiesWithIds())
+        if (inputEvent.IsActionPressed("hard-reset"))
         {
-            if (entityWithId.Entity.IsPlayerControlled)
-            {
-                _currentFrame.SetEntity(entityWithId.Id, entityWithId.Entity with { MoveIntent = cardinalDirection });
-            }
+            HardReset();
         }
 
-        AdvanceFrame();
-    }
+        if (inputEvent.IsActionPressed("reset"))
+        {
+            _gameSession.SoftReset();
+        }
 
-    private void AdvanceFrame()
-    {
-        _previousFrames.Push(_currentFrame);
-        _currentFrame = _currentFrame.CloneAndResolve();
+        if (inputEvent.IsActionPressed("primary_action"))
+        {
+            _gameSession.PrimaryAction();
+        }
+
+        if (inputEvent.IsActionPressed("secondary_action"))
+        {
+            _gameSession.SecondaryAction();
+        }
     }
 
     public void InitializeScreen(int glyphsPerLine, int numberOfLines)
@@ -239,7 +224,8 @@ public partial class Core : Node
         var writePosition = screenPosition;
         for (var i = 0; i < text.Length; i++)
         {
-            GetGlyphAt(writePosition)?.Foreground.ShowGlyph(text[i], color);
+            GetGlyphAt(writePosition)?.Foreground.ShowGlyph(text[i]);
+            GetGlyphAt(writePosition)?.Foreground.SetColor(color);
             writePosition += new Offset(1, 0);
         }
     }
