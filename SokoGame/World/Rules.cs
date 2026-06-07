@@ -11,6 +11,13 @@ public static class Rules
 
         foreach (var (movingEntityId, movingEntity, _) in frame.AllActiveEntitiesWithIds())
         {
+            if (movingEntity.NudgeIntent.HasValue)
+            {
+                // If we have a pending nudge, resolve that
+                result.Add(new TransformSetNudgeIntent(movingEntityId, null));
+                result.Add(new TransformNudge(movingEntityId, movingEntity.NudgeIntent.Value));
+            }
+            
             if (!movingEntity.MoveIntent.HasValue || !movingEntity.Position.HasValue)
             {
                 continue;
@@ -43,7 +50,7 @@ public static class Rules
 
         return result;
     }
-    
+
     public static TransformGroupAnimated HandleCollisions(Frame frame)
     {
         var result = new TransformGroupAnimated(TransformAnimationType.Blocking);
