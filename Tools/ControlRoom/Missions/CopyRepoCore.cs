@@ -12,11 +12,19 @@ public class CopyRepoCore : Mission
 
     public override async Task Run()
     {
+        var sourceRepoUrl = PositionalArgs.Get(0, "Source Repo ssh URL").ParseAsString();
+
+        if (sourceRepoUrl == "self")
+        {
+            // null means "use own URL"
+            sourceRepoUrl = null;
+        }
+        
         var sourceRepo = 
-            await VirtualRepo.GetAndInitialize(PositionalArgs.Get(0, "Source Repo ssh URL").ParseAsString(), "SourceRepo");
+            await VirtualRepo.GetAndInitialize(sourceRepoUrl, "SourceRepo");
         
         var destinationRepo =
-            await VirtualRepo.GetAndInitialize(PositionalArgs.Get(0, "Target Repo ssh URL").ParseAsString(), "TargetRepo");
+            await VirtualRepo.GetAndInitialize(PositionalArgs.Get(1, "Target Repo ssh URL").ParseAsString(), "TargetRepo");
 
         await CopyCoreRepoContents(sourceRepo, destinationRepo);
     }
@@ -93,10 +101,10 @@ public class CopyRepoCore : Mission
             await scrub.Invoke(destinationRepo.Files);
         }
 
-        await PushContents(destinationRepo);
+        await PushContents(destinationRepo, $"Copied {sourceRepo.RepoUrl()}@{sourceRepo.Git.CurrentSha()}");
     }
 
-    private static async Task PushContents(VirtualRepo destinationRepo)
+    private static async Task PushContents(VirtualRepo destinationRepo, string message)
     {
         await destinationRepo.Git.AddAll();
 
@@ -106,7 +114,7 @@ public class CopyRepoCore : Mission
             return;
         }
 
-        await destinationRepo.CommitAndPush($"Updated as of {DateTime.Now}");
+        await destinationRepo.CommitAndPush(message);
     }
 
     /// <summary>
