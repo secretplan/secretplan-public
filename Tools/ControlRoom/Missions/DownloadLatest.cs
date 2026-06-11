@@ -1,4 +1,5 @@
 ﻿using ControlRoom.Core;
+using ControlRoom.Programs;
 
 namespace ControlRoom.Missions;
 
@@ -16,5 +17,11 @@ public class DownloadLatest : Mission
         var destinationRepo =
             await VirtualRepo.GetAndInitialize();
         await CopyRepoCore.CopyCoreRepoContents(sourceRepo, destinationRepo);
+
+        if ((await OutPipe.AgentPrompt("Do you want to pull `main` into this branch?", "no"))?.StartsWith("y") == true)
+        {
+            var localGit = new ProgramGit(".");
+            await localGit.MergeInRemoteBranch("main");
+        }
     }
 }

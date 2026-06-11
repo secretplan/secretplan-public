@@ -101,7 +101,7 @@ public class CopyRepoCore : Mission
             await scrub.Invoke(destinationRepo.Files);
         }
 
-        await PushContents(destinationRepo, $"Copied {sourceRepo.RepoUrl()}@{sourceRepo.Git.CurrentSha()}");
+        await PushContents(destinationRepo, $"Copied {await sourceRepo.RepoUrl()}@{await sourceRepo.Git.CurrentSha()}");
     }
 
     private static async Task PushContents(VirtualRepo destinationRepo, string message)
