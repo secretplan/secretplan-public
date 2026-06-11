@@ -29,7 +29,7 @@ public class CopyRepoCore : Mission
         await CopyCoreRepoContents(sourceRepo, destinationRepo);
     }
 
-    public static async Task CopyCoreRepoContents(VirtualRepo sourceRepo, VirtualRepo destinationRepo, Func<RealFileSystem, Task>? scrub = null)
+    public static async Task CopyCoreRepoContents(VirtualRepo sourceRepo, VirtualRepo destinationRepo, string? message = null, Func<RealFileSystem, Task>? scrub = null)
     {
         string[] exactFilesToCopy =
         [
@@ -101,7 +101,7 @@ public class CopyRepoCore : Mission
             await scrub.Invoke(destinationRepo.Files);
         }
 
-        await PushContents(destinationRepo, $"Copied {await sourceRepo.RepoUrl()}@{await sourceRepo.Git.CurrentSha()}");
+        await PushContents(destinationRepo, message ?? $"Copied {await sourceRepo.RepoUrl()}@{await sourceRepo.Git.CurrentSha()}");
     }
 
     private static async Task PushContents(VirtualRepo destinationRepo, string message)
