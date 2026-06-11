@@ -2,7 +2,7 @@
 using SecretPlanCore.Core;
 using SecretPlanCore.Telemetry;
 
-namespace BirdGameData.Analytics;
+namespace SecretPlanCore.Analytics;
 
 public abstract class BaseAnalytics
 {

@@ -1,5 +1,5 @@
 ﻿using SecretPlanCore.Telemetry;
 
-namespace BirdGameData.Analytics;
+namespace SecretPlanCore.Analytics;
 
 public readonly record struct TimestampedTelemetryEvent(DateTime TimeStamp, TelemetryEvent TelemetryEvent);

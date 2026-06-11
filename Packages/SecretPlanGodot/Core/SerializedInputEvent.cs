@@ -1,5 +1,4 @@
-﻿using BirdGame.Core;
-using Godot;
+﻿using Godot;
 using Newtonsoft.Json;
 
 namespace SecretPlanGodot.Core;

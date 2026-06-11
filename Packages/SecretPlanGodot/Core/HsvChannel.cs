@@ -1,4 +1,4 @@
-﻿namespace SecretPlanGodot;
+﻿namespace SecretPlanGodot.Core;
 
 public enum HsvChannel
 {

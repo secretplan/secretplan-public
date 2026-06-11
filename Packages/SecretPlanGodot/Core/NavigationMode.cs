@@ -1,4 +1,4 @@
-﻿namespace BirdGame.Core;
+﻿namespace SecretPlanGodot.Core;
 
 public enum NavigationMode 
 {

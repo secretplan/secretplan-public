@@ -1,6 +1,4 @@
-﻿using SecretPlanGodot.Testing;
-
-namespace BirdGameTests;
+﻿namespace SecretPlanGodot.Testing;
 
 public class Assert
 {
