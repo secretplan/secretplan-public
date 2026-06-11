@@ -3,6 +3,8 @@ using Newtonsoft.Json;
 
 namespace SecretPlanGodot.Configuration;
 
+[CustomEditor("res://Scenes/ConfigEditor/Vector3Editor.tscn")]
+
 public record struct SerializedVector3(
     [property: JsonProperty("x")] float X,
     [property: JsonProperty("y")] float Y,
