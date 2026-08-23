@@ -64,10 +64,10 @@ public static class EnumExtensions
     public static LocalizationRootTable ReadOrDefault(this LocalizationRootTableEnum self)
     {
         var valueAsInt = (System.UInt32) self;
-        var value = SecretPlanCore.Configuration.ConfigServer.Instance.GetInstance<FoobarData.DistributableConfig.LocalizationRootTable>(valueAsInt);
+        var value = SecretPlanCore.Configuration.ConfigServer.Instance.GetInstance<DATA_ASSEMBLY.DistributableConfig.LocalizationRootTable>(valueAsInt);
         if (value == null)
         {
-            var result = new FoobarData.DistributableConfig.LocalizationRootTable();
+            var result = new DATA_ASSEMBLY.DistributableConfig.LocalizationRootTable();
             result.InstanceInfo = result.InstanceInfo with { InstanceId = 0 };
             return result;
         }
@@ -77,10 +77,10 @@ public static class EnumExtensions
     public static Locale ReadOrDefault(this LocaleEnum self)
     {
         var valueAsInt = (System.UInt32) self;
-        var value = SecretPlanCore.Configuration.ConfigServer.Instance.GetInstance<FoobarData.DistributableConfig.Locale>(valueAsInt);
+        var value = SecretPlanCore.Configuration.ConfigServer.Instance.GetInstance<DATA_ASSEMBLY.DistributableConfig.Locale>(valueAsInt);
         if (value == null)
         {
-            var result = new FoobarData.DistributableConfig.Locale();
+            var result = new DATA_ASSEMBLY.DistributableConfig.Locale();
             result.InstanceInfo = result.InstanceInfo with { InstanceId = 0 };
             return result;
         }
@@ -90,10 +90,10 @@ public static class EnumExtensions
     public static LocalizationIdTable ReadOrDefault(this LocalizationIdTableEnum self)
     {
         var valueAsInt = (System.UInt32) self;
-        var value = SecretPlanCore.Configuration.ConfigServer.Instance.GetInstance<FoobarData.DistributableConfig.LocalizationIdTable>(valueAsInt);
+        var value = SecretPlanCore.Configuration.ConfigServer.Instance.GetInstance<DATA_ASSEMBLY.DistributableConfig.LocalizationIdTable>(valueAsInt);
         if (value == null)
         {
-            var result = new FoobarData.DistributableConfig.LocalizationIdTable();
+            var result = new DATA_ASSEMBLY.DistributableConfig.LocalizationIdTable();
             result.InstanceInfo = result.InstanceInfo with { InstanceId = 0 };
             return result;
         }
