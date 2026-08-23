@@ -56,6 +56,8 @@ public class CopyRepoCore : Mission
 
         foreach (var directoryPath in directoriesToCopy)
         {
+            destinationRepo.Files.DeleteDirectory(directoryPath, true);
+            
             await CopyDirectory(sourceRepo.Files.GetPathOfFile(directoryPath),
                 destinationRepo.Files.GetPathOfFile(directoryPath));
         }
