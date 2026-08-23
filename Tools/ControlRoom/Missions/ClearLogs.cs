@@ -1,20 +1,20 @@
-﻿using ControlRoom.Core;
+﻿using ControlRoomLib.Core;
 using SecretPlanCore.Core;
 
 namespace ControlRoom.Missions;
 
 public class ClearLogs : Mission
 {
-    public ClearLogs(List<string> rawArgs) : base(rawArgs)
+    public ClearLogs(List<string> rawArgs, MissionVariables missionVariables) : base(rawArgs, missionVariables)
     {
     }
 
     public override async Task Run()
     {
-        var files = new RealFileSystem(Constants.LogsFolder);
+        var files = new RealFileSystem(ControlRoomConstants.LogsFolder);
         foreach (var file in files.GetFilesAt("."))
         {
-            if (file != Constants.CurrentLogFile)
+            if (file != ControlRoomConstants.CurrentLogFile)
             {
                 await OutPipe.AgentLogMessage($"Deleting {file}");
                 files.DeleteFile(file);

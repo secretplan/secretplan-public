@@ -1,11 +1,11 @@
-﻿using ControlRoom.Core;
-using ControlRoom.Programs;
+﻿using ControlRoomLib.Core;
+using ControlRoomLib.Programs;
 
 namespace ControlRoom.Missions;
 
 public class BuildGodotProject : Mission
 {
-    public BuildGodotProject(List<string> rawArgs) : base(rawArgs)
+    public BuildGodotProject(List<string> rawArgs, MissionVariables missionVariables) : base(rawArgs, missionVariables)
     {
     }
 
@@ -15,7 +15,7 @@ public class BuildGodotProject : Mission
     {
         MissionAssert.MissionVariableNotNull(MissionVariables, nameof(MissionVariables.GameDirectory));
         var buildTarget = PositionalArgs.Get(0, "Target OS").ParseAsBuildTarget();
-        var steamBuildInfo = Constants.GetFlockAroundSteamBuildInfo(SteamAppType.FullGame);
+        var steamBuildInfo = ControlRoomConstants.GetFlockAroundSteamBuildInfo(SteamAppType.FullGame);
         
         var virtualRepo = await VirtualRepo.GetAndInitialize();
         
@@ -33,7 +33,7 @@ public class BuildGodotProject : Mission
         await OutPipe.AgentLogMessage("Preparing local environment for smoke test");
         await File.WriteAllTextAsync(Path.Join(outputDirectory.FullName, "steam_appid.txt"), steamBuildInfo.AppId.ToString());
         
-        var explorer = Constants.FileExplorerProgram();
+        var explorer = ControlRoomConstants.FileExplorerProgram();
         await explorer.Open(godot.GetOutputDirectoryForProject(GameDirectory, buildTarget).FullName);
     }
 }

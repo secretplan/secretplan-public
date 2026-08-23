@@ -1,0 +1,12 @@
+[gd_scene load_steps=3 format=3 uid="uid://dk1wg5w6jpx51"]
+
+[ext_resource type="Script" uid="uid://oqscgwy4ecl0" path="res://FriendShapedPlugin/ConfigEditor/Scenes/AnyResourceReferenceEditor.cs" id="1_tr4th"]
+[ext_resource type="PackedScene" uid="uid://cc2vpbdvdmh2y" path="res://FriendShapedPlugin/ConfigEditor/Scenes/ResourceReferenceLink.tscn" id="2_4yj8e"]
+
+[node name="ResourceReferenceField" type="VBoxContainer"]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("1_tr4th")
+
+[node name="ResourceReferenceLink" parent="." instance=ExtResource("2_4yj8e")]
+layout_mode = 2

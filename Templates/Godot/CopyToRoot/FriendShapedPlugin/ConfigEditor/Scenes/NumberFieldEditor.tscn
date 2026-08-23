@@ -1,0 +1,14 @@
+[gd_scene load_steps=2 format=3 uid="uid://bkbxvk8oj48a1"]
+
+[ext_resource type="Script" uid="uid://dgob8obp3ib5m" path="res://FriendShapedPlugin/ConfigEditor/Scenes/NumberEditor.cs" id="1_kdlu2"]
+
+[node name="NumberFieldEditor" type="HBoxContainer"]
+offset_right = 199.0
+offset_bottom = 49.0
+size_flags_horizontal = 3
+script = ExtResource("1_kdlu2")
+
+[node name="LineEdit" type="LineEdit" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "23"

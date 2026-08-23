@@ -1,0 +1,20 @@
+[gd_scene load_steps=3 format=3 uid="uid://dp4pwu11oo61b"]
+
+[ext_resource type="Script" uid="uid://duai6rvmldxbx" path="res://FriendShapedPlugin/ConfigEditor/Scenes/ObjectEditor.cs" id="1_bwj0g"]
+[ext_resource type="PackedScene" uid="uid://bkbxvk8oj48a1" path="res://FriendShapedPlugin/ConfigEditor/Scenes/NumberFieldEditor.tscn" id="2_pqxvf"]
+
+[node name="ObjectFieldEditor" type="HBoxContainer"]
+offset_right = 180.0
+offset_bottom = 49.0
+size_flags_horizontal = 3
+script = ExtResource("1_bwj0g")
+
+[node name="ObjectContent" type="VBoxContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="sample" parent="ObjectContent" instance=ExtResource("2_pqxvf")]
+layout_mode = 2
+
+[node name="sample2" parent="ObjectContent" instance=ExtResource("2_pqxvf")]
+layout_mode = 2

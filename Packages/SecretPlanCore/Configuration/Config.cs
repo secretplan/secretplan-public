@@ -13,6 +13,12 @@ public abstract class Config
     [JsonProperty("config_info")]
     public ConfigInstanceInfo InstanceInfo { get; set; }
 
+    /// <summary>
+    ///     Runtime property that describes where this config came from originally
+    /// </summary>
+    [JsonIgnore]
+    public IFileSystem? SourceFileSystem { get; set; }
+
     private ConfigInstanceInfo GenerateInstanceInfo()
     {
         return new ConfigInstanceInfo(

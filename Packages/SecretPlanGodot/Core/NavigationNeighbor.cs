@@ -23,7 +23,7 @@ public readonly struct NavigationNeighbor(Control? control, NavigationNeighbor.N
     {
         return navigationType switch
         {
-            NeighborType.ExactControl when control.IsValid() => control.GetPath(),
+            NeighborType.ExactControl when control.IsValidAndNotQueuedForDeletion() => control.GetPath(),
             NeighborType.Self => self.GetPath(),
             _ => null
         };

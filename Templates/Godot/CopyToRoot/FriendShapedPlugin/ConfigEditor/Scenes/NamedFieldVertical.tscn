@@ -1,0 +1,20 @@
+[gd_scene load_steps=2 format=3 uid="uid://c3l16x28grpfo"]
+
+[ext_resource type="Script" uid="uid://cfjnrupt7072d" path="res://FriendShapedPlugin/ConfigEditor/Scenes/NamedFieldDisplay.cs" id="1_mvt8j"]
+
+[node name="NamedFieldHorizontal" type="PanelContainer"]
+script = ExtResource("1_mvt8j")
+
+[node name="Root" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="FieldName" type="Label" parent="Root"]
+layout_mode = 2
+text = "Title"
+
+[node name="EditorContent" type="HBoxContainer" parent="Root"]
+layout_mode = 2
+
+[node name="Button" type="Button" parent="Root/EditorContent"]
+layout_mode = 2
+text = "some content"

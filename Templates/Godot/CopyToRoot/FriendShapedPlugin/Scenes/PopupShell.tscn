@@ -1,0 +1,40 @@
+[gd_scene format=3 uid="uid://midllvhvmhj2"]
+
+[ext_resource type="Script" uid="uid://q0k2farv8sqk" path="res://FriendShapedPlugin/PopupShell.cs" id="1_6line"]
+[ext_resource type="Script" uid="uid://ckgwlt2wlqs7o" path="res://FriendShapedPlugin/UiAspectScalerContainer.cs" id="2_nkped"]
+
+[node name="PopupShell" type="Control" unique_id=1536940184]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_6line")
+
+[node name="ScrimContent" type="Control" parent="." unique_id=1275589212]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="BaseScrim" type="ColorRect" parent="ScrimContent" unique_id=388106337]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.019607844, 0.08627451, 0.15294118, 0.44705883)
+
+[node name="AspectContent" type="AspectRatioContainer" parent="." unique_id=1279719460]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+ratio = 1.6
+script = ExtResource("2_nkped")

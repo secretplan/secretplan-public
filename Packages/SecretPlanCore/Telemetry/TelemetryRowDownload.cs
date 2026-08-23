@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace SecretPlanCore.Telemetry;
@@ -34,5 +35,17 @@ public class TelemetryRowDownload : TelemetryRowUpload
         }
 
         return null;
+    }
+
+    public override string ToString()
+    {
+        var stringBuilder = new StringBuilder();
+        stringBuilder.AppendLine($"Session: {SessionId}");
+        stringBuilder.AppendLine($"Player: {PlayerId}");
+        stringBuilder.AppendLine($"Branch: {Branch}");
+        stringBuilder.AppendLine($"EventType: {EventTypeId}");
+        stringBuilder.AppendLine($"CreatedAt: {CreatedAtTimeStamp}");
+        stringBuilder.AppendLine($"Payload: {ReadPayload()}");
+        return stringBuilder.ToString();
     }
 }

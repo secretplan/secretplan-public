@@ -1,5 +1,5 @@
-using ControlRoom.Core;
-using ControlRoom.Programs;
+using ControlRoomLib.Core;
+using ControlRoomLib.Programs;
 using SecretPlanCore.Core;
 
 namespace ControlRoom.Missions;
@@ -9,7 +9,7 @@ public class AllSln : Mission
     private const string AllSlnFileNameWithoutExtension = "All";
     private const string AllSlnFileName = "All.sln";
 
-    public AllSln(List<string> rawArgs) : base(rawArgs)
+    public AllSln(List<string> rawArgs, MissionVariables missionVariables) : base(rawArgs, missionVariables)
     {
     }
 

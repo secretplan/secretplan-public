@@ -8,3 +8,6 @@
 
 # We have to setup the symlink just right on macOS and then ignore it windows :(
 addons/steam-multiplayer-peer/macos/libsteam_api.dylib
+
+# annoying file that changes from macOS to windows
+.idea/.idea.*/.idea/libraries/GdSdk.xml

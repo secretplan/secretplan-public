@@ -8,6 +8,8 @@ public class ConfigServer
     public const string FileExtensionNoDot = "json";
     private static readonly NoiseBasedRng _random = new(0);
 
+    private readonly HashSet<int> _assignabilityTable = new();
+
     private readonly Dictionary<uint, Config?> _instances = new();
 
     /// <summary>
@@ -93,22 +95,26 @@ public class ConfigServer
     /// </summary>
     public Config? LoadFromJsonUntyped(string configName, string jsonText, bool shouldCache)
     {
-        var unknownId = TypeIdFromType(typeof(UnknownConfig));
-        var typeId = LoadFromJson<UnknownConfig>("Temp", jsonText, false)?.InstanceInfo.TypeId ?? unknownId;
+        var typeId = GetTypeIdFromJson(jsonText);
 
-        if (typeId == unknownId)
+        if (typeId == null)
         {
             return null;
         }
 
         var type = TypeFromId(typeId);
 
-        if (type == null)
+        if (type == null || type == typeof(UnknownConfig))
         {
             return null;
         }
 
         return LoadFromJsonInternal(configName, jsonText, type, shouldCache);
+    }
+
+    public string? GetTypeIdFromJson(string jsonText)
+    {
+        return LoadFromJson<UnknownConfig>("Temp", jsonText, false)?.InstanceInfo.TypeId;
     }
 
     /// <summary>
@@ -146,13 +152,20 @@ public class ConfigServer
         {
             if (config != foundInstance)
             {
-                throw new Exception(
-                    $"InstanceId collision! {config.InstanceInfo.Name} wants to reserve id [{instanceId}] but {foundInstance} already has it");
+                LogError(
+                    $"InstanceId collision! {config.InstanceInfo.Name} is claiming ID [{instanceId}], which overwrites {foundInstance}.");
             }
         }
 
         _instances[instanceId] = config;
     }
+
+    private static void LogError(string message)
+    {
+        MessageLogged?.Invoke(LogType.Error, message);
+    }
+
+    public static event Action<LogType, string>? MessageLogged;
 
     /// <summary>
     ///     Scan all loaded assemblies for config types
@@ -240,7 +253,7 @@ public class ConfigServer
 
     public string CreateFileName(Type type, string simpleName)
     {
-        return $"Config/{TypeIdFromType(type)}_{simpleName}.json";
+        return $"{TypeIdFromType(type)}_{simpleName}.json";
     }
 
     /// <summary>
@@ -352,8 +365,10 @@ public class ConfigServer
 
     public void WriteAllConfigsTxt(IFileSystem files)
     {
-        var instanceNames = GetAllInstances().Select(a => a.InstanceInfo.Name).ToList();
+        var instanceNames = GetAllInstances().Where(a => a.SourceFileSystem == null).Select(a => a.InstanceInfo.Name)
+            .ToList();
         instanceNames.Sort();
+        
         files.WriteToFile("AllConfigs.txt", instanceNames.ToArray());
     }
 
@@ -423,14 +438,15 @@ public class ConfigServer
         }
 
         enumFileContent.AppendLine(allConfigTypesEnum.GenerateSourceCodeBody());
-        
+
         enumFileContent.AppendLine($"public static class {allConfigTypesEnumName}Extensions");
         enumFileContent.AppendLine("{");
         enumFileContent.AppendLine($"    public static Type? ReadType(this {allConfigTypesEnumName} configTypeEnum)");
         enumFileContent.AppendLine("    {");
         foreach (var (hash, typeId) in typeIdsToHashes)
         {
-            enumFileContent.AppendLine($"        if (configTypeEnum == {allConfigTypesEnumName}.{typeId}) {{ return {typeof(ConfigServer).FullName}.Instance.{nameof(TypeFromId)}(\"{typeId}\"); }}");
+            enumFileContent.AppendLine(
+                $"        if (configTypeEnum == {allConfigTypesEnumName}.{typeId}) {{ return {typeof(ConfigServer).FullName}.Instance.{nameof(TypeFromId)}(\"{typeId}\"); }}");
         }
 
         enumFileContent.AppendLine("        return null;");
@@ -546,7 +562,8 @@ public class ConfigServer
     {
         foreach (var config in GetAllInstances())
         {
-            WriteConfig(gameDirectoryFiles, config);
+            var fileSystem = config.SourceFileSystem ?? gameDirectoryFiles;
+            WriteConfig(fileSystem, config);
         }
     }
 
@@ -593,5 +610,85 @@ public class ConfigServer
     public static string Slugify(string name)
     {
         return name.Replace(" ", "_").Replace("-", "_").ToLower();
+    }
+
+    public void DoPreload()
+    {
+        foreach (var configWithPreload in Instance.GetAllInstancesOfType<IHasPreloadStep>())
+        {
+            configWithPreload.PreloadStep();
+        }
+    }
+
+    public bool TryRenameInstance(Config instanceToRename, string newSimpleName, IFileSystem gameDirectoryFiles)
+    {
+        var destinationNameIsValid = Instance.GetAllInstances().All(a => a.InstanceInfo.Name != newSimpleName);
+        if (!destinationNameIsValid)
+        {
+            return false;
+        }
+
+        var oldFileName = instanceToRename.InstanceInfo.Name;
+        var path = instanceToRename.InstanceInfo.Directory();
+
+        if (!string.IsNullOrEmpty(path))
+        {
+            path += "/";
+        }
+
+        var newFileName = path + CreateFileName(instanceToRename.GetType(), newSimpleName);
+
+        
+        instanceToRename.InstanceInfo = instanceToRename.InstanceInfo with { Name = newFileName };
+
+        instanceToRename.Serialize(newFileName).WriteToFile(gameDirectoryFiles);
+        gameDirectoryFiles.DeleteFile(oldFileName);
+
+        EditorConfigChanged?.Invoke(instanceToRename.InstanceInfo.InstanceId);
+
+        return true;
+    }
+
+    public void DeleteInstance(Config instanceToRemove, IFileSystem gameDirectoryFiles)
+    {
+        var oldFileName = instanceToRemove.InstanceInfo.Name;
+        gameDirectoryFiles.DeleteFile(oldFileName);
+
+        EditorConfigChanged?.Invoke(instanceToRemove.InstanceInfo.InstanceId);
+    }
+
+    /// <summary>
+    ///     Fires when a Config is deleted or renamed. Only relevant in an editor context.
+    /// </summary>
+    public event Action<uint>? EditorConfigChanged;
+
+    /// <summary>
+    ///     Returns true if the otherType can be assigned to the desired type (aka: the desired type is a parent of other type)
+    /// </summary>
+    public bool IsTypeIdAssignableTo(string desiredTypeName, string otherTypeName)
+    {
+        if (desiredTypeName == otherTypeName)
+        {
+            return true;
+        }
+
+        var hash = HashCode.Combine(desiredTypeName, otherTypeName);
+
+        if (_assignabilityTable.Contains(hash))
+        {
+            return true;
+        }
+
+        var desiredType = _typeIds.GetKeyFromValue(desiredTypeName);
+        var otherType = _typeIds.GetKeyFromValue(otherTypeName);
+
+        if (otherType != null && otherType.IsAssignableTo(desiredType))
+        {
+            // cache this answer for later
+            _assignabilityTable.Add(hash);
+            return true;
+        }
+
+        return false;
     }
 }

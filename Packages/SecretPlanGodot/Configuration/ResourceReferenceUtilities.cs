@@ -4,6 +4,32 @@ namespace SecretPlanGodot.Configuration;
 
 public static class ResourceReferenceUtilities
 {
+    private static Dictionary<string, Type>? _underlyingExtensionToType;
+
+    /// <summary>
+    ///     Map of extensions (.png, .ogg, etc) to resource types (Texture2D, AudioStream, PackedScene)
+    /// </summary>
+    private static Dictionary<string, Type> ExtensionToType
+    {
+        get
+        {
+            if (_underlyingExtensionToType == null)
+            {
+                _underlyingExtensionToType = new Dictionary<string, Type>
+                {
+                    [".png"] = typeof(Texture2D),
+                    [".bmp"] = typeof(Texture2D),
+                    [".tga"] = typeof(Texture2D),
+                    [".ogg"] = typeof(AudioStreamOggVorbis),
+                    [".wav"] = typeof(AudioStreamWav),
+                    [".tscn"] = typeof(PackedScene)
+                };
+            }
+
+            return _underlyingExtensionToType;
+        }
+    }
+
     public static IResourceReference CreateResourceReference(Type resourceReferenceType, string path)
     {
         if (Activator.CreateInstance(resourceReferenceType, path) is not IResourceReference instance)
@@ -14,26 +40,44 @@ public static class ResourceReferenceUtilities
         return instance;
     }
 
-    public static IEnumerable<string> GetFileExtensions(Type resourceReferenceType)
+    public static Type GetResourceTypeFromExtension(string extensionWithDot)
+    {
+        if (ExtensionToType.TryGetValue(extensionWithDot, out var value))
+        {
+            return value;
+        }
+
+        return typeof(Resource);
+    }
+
+    public static bool PathLooksLikeResource<T>(string path) where T : Resource
+    {
+        return GetResourceTypeFromExtension($".{path.GetExtension()}") == typeof(T);
+    }
+
+    public static IEnumerable<string> GetSupportedFileExtensions(Type resourceReferenceType)
     {
         var resourceType = CreateResourceReference(resourceReferenceType, "").ResourceType;
-        
-        if (resourceType == typeof(Texture2D))
+
+        if (!resourceType.IsAssignableTo(typeof(Resource)))
         {
-            yield return ".png";
-            yield return ".bmp";
-            yield return ".tga";
+            yield break;
         }
 
-        if (resourceType == typeof(AudioStream))
+        var hasFoundValidResourceType = false;
+
+        foreach (var (extension, typeAssociatedWithExtension) in ExtensionToType)
         {
-            yield return ".ogg";
-            yield return ".wav";
+            if (typeAssociatedWithExtension.IsAssignableTo(resourceType))
+            {
+                yield return extension;
+                hasFoundValidResourceType = true;
+            }
         }
 
-        if (resourceType == typeof(PackedScene))
+        if (!hasFoundValidResourceType)
         {
-            yield return ".tscn";
+            yield return ".tres";
         }
     }
 }

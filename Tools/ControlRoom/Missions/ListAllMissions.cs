@@ -1,4 +1,4 @@
-﻿using ControlRoom.Core;
+﻿using ControlRoomLib.Core;
 using JetBrains.Annotations;
 using SecretPlanCore.Core;
 
@@ -7,7 +7,7 @@ namespace ControlRoom.Missions;
 [UsedImplicitly]
 public class ListAllMissions : Mission
 {
-    public ListAllMissions(List<string> rawArgs) : base(rawArgs)
+    public ListAllMissions(List<string> rawArgs, MissionVariables missionVariables) : base(rawArgs, missionVariables)
     {
     }
 

@@ -39,6 +39,11 @@ public class PackedSceneReferenceTyped<T> : IResourceReference where T : Node
     [JsonIgnore]
     public Type ResourceType => typeof(PackedScene);
 
+    public object? GetOrLoadOrNullTypeless()
+    {
+        return CachedPackedScene.GetOrLoadOrNull();
+    }
+
     public TDerived LoadAndInstantiateAs<TDerived>() where TDerived : T
     {
         return CachedPackedScene.GetOrLoad().Instantiate<TDerived>();

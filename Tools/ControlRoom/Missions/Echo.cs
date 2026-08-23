@@ -1,4 +1,4 @@
-﻿using ControlRoom.Core;
+﻿using ControlRoomLib.Core;
 using JetBrains.Annotations;
 
 namespace ControlRoom.Missions;
@@ -6,7 +6,7 @@ namespace ControlRoom.Missions;
 [UsedImplicitly]
 public class Echo : Mission
 {
-    public Echo(List<string> rawArgs) : base(rawArgs)
+    public Echo(List<string> rawArgs, MissionVariables missionVariables) : base(rawArgs, missionVariables)
     {
     }
 

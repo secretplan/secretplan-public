@@ -1,0 +1,26 @@
+[gd_scene format=3 uid="uid://6j405w4w0nym"]
+
+[ext_resource type="Theme" uid="uid://di5wu2ydonwwf" path="res://FriendShapedPlugin/ConfigEditor/Scenes/ConfigEditorTheme.tres" id="1_m2qcf"]
+[ext_resource type="Script" uid="uid://dhhrt0wo37sos" path="res://FriendShapedPlugin/ConfigEditor/ConfigSearchPopup.cs" id="2_bq838"]
+[ext_resource type="PackedScene" uid="uid://bnx8505pi6k64" path="res://FriendShapedPlugin/ConfigEditor/Scenes/QuickSearchController.tscn" id="3_68ttj"]
+
+[node name="ConfigSearchPopup" type="Control" unique_id=348388840]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 260.0
+offset_top = 89.0
+offset_right = -260.0
+offset_bottom = -89.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme = ExtResource("1_m2qcf")
+script = ExtResource("2_bq838")
+
+[node name="QuickSearchController" parent="." unique_id=296454043 instance=ExtResource("3_68ttj")]
+layout_mode = 1
+offset_top = -179.5
+offset_bottom = 179.5

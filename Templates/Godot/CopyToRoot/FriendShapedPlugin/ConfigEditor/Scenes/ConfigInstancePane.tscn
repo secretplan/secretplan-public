@@ -1,0 +1,64 @@
+[gd_scene format=3 uid="uid://dsra8lc0jxt5k"]
+
+[ext_resource type="Script" uid="uid://cfaeialyx6cua" path="res://FriendShapedPlugin/ConfigEditor/ConfigInstancePane.cs" id="1_3cje5"]
+[ext_resource type="Theme" uid="uid://di5wu2ydonwwf" path="res://FriendShapedPlugin/ConfigEditor/Scenes/ConfigEditorTheme.tres" id="1_f1lph"]
+[ext_resource type="PackedScene" uid="uid://csrcfrpi1oktc" path="res://FriendShapedPlugin/ConfigEditor/Scenes/ConfigInstanceTitle.tscn" id="2_nfs0b"]
+[ext_resource type="Script" uid="uid://bkypbhgr4mrn6" path="res://FriendShapedPlugin/ConfigEditor/IgnoreScrollOnShift.cs" id="3_nfs0b"]
+[ext_resource type="PackedScene" uid="uid://cawcb70j2xubh" path="res://FriendShapedPlugin/ConfigEditor/Scenes/BoolFieldEditor.tscn" id="8_46l62"]
+
+[node name="ConfigInstancePane" type="VBoxContainer" unique_id=745140599]
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_right = 575.0
+grow_vertical = 2
+size_flags_vertical = 3
+theme = ExtResource("1_f1lph")
+script = ExtResource("1_3cje5")
+
+[node name="TitleArea" type="HBoxContainer" parent="." unique_id=34751831]
+layout_mode = 2
+
+[node name="Title" parent="TitleArea" unique_id=1251295996 instance=ExtResource("2_nfs0b")]
+layout_mode = 2
+
+[node name="Control" type="Control" parent="TitleArea" unique_id=1864086185]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="RenameButton" type="Button" parent="TitleArea" unique_id=1680141792]
+layout_mode = 2
+text = "✏️"
+
+[node name="DuplicateButton" type="Button" parent="TitleArea" unique_id=387982420]
+layout_mode = 2
+text = "📄"
+
+[node name="CloseButton" type="Button" parent="TitleArea" unique_id=1915552053]
+layout_mode = 2
+text = "Close"
+
+[node name="FieldsScroll" type="ScrollContainer" parent="." unique_id=1689892524]
+layout_mode = 2
+size_flags_vertical = 3
+follow_focus = true
+draw_focus_border = true
+horizontal_scroll_mode = 0
+script = ExtResource("3_nfs0b")
+
+[node name="PaneContent" type="VBoxContainer" parent="FieldsScroll" unique_id=1168293481]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="BoolField" type="PanelContainer" parent="FieldsScroll/PaneContent" unique_id=1728471292]
+layout_mode = 2
+
+[node name="HStack" type="HBoxContainer" parent="FieldsScroll/PaneContent/BoolField" unique_id=1753603040]
+layout_mode = 2
+
+[node name="FieldName" type="Label" parent="FieldsScroll/PaneContent/BoolField/HStack" unique_id=51606951]
+layout_mode = 2
+text = "Do Not Spawn"
+
+[node name="BoolFieldEditor" parent="FieldsScroll/PaneContent/BoolField/HStack" unique_id=1873315639 instance=ExtResource("8_46l62")]
+layout_mode = 2

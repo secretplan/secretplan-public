@@ -1,25 +1,25 @@
 ﻿using System.Collections;
 using System.Reflection;
 using System.Text;
-using ControlRoom.Core;
+using ControlRoomLib.Core;
 using JetBrains.Annotations;
 using SecretPlanCore.Configuration;
 using SecretPlanCore.Core;
 using SecretPlanGodot.Configuration;
 
-namespace ControlRoom.Missions;
+namespace ControlRoomLib.Missions;
 
 [UsedImplicitly]
-public class ConfigWorkbench : Mission
+public class ConfigManagement : Mission
 {
-    public ConfigWorkbench(List<string> rawArgs) : base(rawArgs)
+    public ConfigManagement(List<string> rawArgs, MissionVariables missionVariables) : base(rawArgs, missionVariables)
     {
     }
 
     public override async Task Run()
     {
         var command = PositionalArgs.Get(0, "Command")
-            .ParseAsSpecificString("list", "create", "renormalize", "read", "catalogue", "copy");
+            .ParseAsSpecificString("list", "create", "add", "renormalize", "read", "catalogue", "copy", "rename");
 
         await OutPipe.AgentLogMessage($"Loading assembly: {DataAssemblyName()}");
         Assembly.Load(DataAssemblyName());
@@ -29,7 +29,11 @@ public class ConfigWorkbench : Mission
             case "list":
                 await ListConfigs();
                 break;
-            case "create":
+            case "rename":
+                await RenameConfig(PositionalArgs.Get(1, "Old Config").ParseAsString(),
+                    PositionalArgs.Get(2, "New Name").ParseAsString());
+                break;
+            case "create" or "add":
                 await CreateConfig(PositionalArgs.Get(1, "Type Name").ParseAsString(),
                     PositionalArgs.Get(2, "Instance Name").ParseAsString());
                 break;
@@ -47,6 +51,29 @@ public class ConfigWorkbench : Mission
                 await WriteConfigCatalogue();
                 break;
         }
+    }
+
+    private async Task RenameConfig(string oldName, string newName)
+    {
+        await SetupConfigServer(MissionVariables.GameDirectoryFiles());
+        
+        var searchResult = ConfigServer.Instance.SearchForInstance<Config>(oldName).ToList();
+        if (searchResult.Count == 0)
+        {
+            throw new MissionFailedException($"Could not find a config matching {oldName}");
+        }
+
+        var oldConfig = searchResult.First();
+        var gameDirectoryFiles = MissionVariables.GameDirectoryFiles();
+
+        if (!ConfigServer.Instance.TryRenameInstance(oldConfig, newName, gameDirectoryFiles))
+        {
+            throw new Exception("Rename failed!");
+        }
+        
+        await OutPipe.AgentLogMessage($"Renamed {oldName} to {newName}");
+
+        await WriteConfigCatalogue();
     }
 
     private async Task WriteConfigCatalogue()
@@ -94,7 +121,7 @@ public class ConfigWorkbench : Mission
             name = $"{typeId}_{name}";
         }
 
-        instance.Serialize($"Config/{name}.json").WriteToFile(MissionVariables.GameDirectoryFiles());
+        instance.Serialize($"{name}.json").WriteToFile(MissionVariables.GameDirectoryFiles().GetDirectory("Config"));
     }
 
     private async Task ReadConfig(string path)
@@ -227,18 +254,18 @@ public class ConfigWorkbench : Mission
         }
     }
 
-    public static async Task SetupConfigServer(IFileSystem files)
+    public static async Task SetupConfigServer(IFileSystem gameDirectoryFiles)
     {
         await OutPipe.AgentLogMessage("Loading Configs into memory");
         ConfigServer.Clear();
-        foreach (var filePath in files.GetFilesAt(".", ConfigServer.FileExtensionNoDot))
+        foreach (var filePath in gameDirectoryFiles.GetFilesAt(".", ConfigServer.FileExtensionNoDot))
         {
             if (filePath.StartsWith(".godot"))
             {
                 continue;
             }
 
-            ConfigServer.Instance.LoadFromJsonUntyped(filePath, await files.ReadFileAsync(filePath), true);
+            ConfigServer.Instance.LoadFromJsonUntyped(filePath, await gameDirectoryFiles.ReadFileAsync(filePath), true);
         }
     }
 }

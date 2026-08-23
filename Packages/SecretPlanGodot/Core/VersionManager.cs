@@ -14,8 +14,8 @@ public static class VersionManager
         {
             try
             {
-                var json = FileAccess.Open("res://VERSION.json", FileAccess.ModeFlags.Read).GetAsText();
-                _version = JsonConvert.DeserializeObject<SecretPlanVersion>(json);
+                using var file = FileAccess.Open("res://VERSION.json", FileAccess.ModeFlags.Read);
+                _version = JsonConvert.DeserializeObject<SecretPlanVersion>(file.GetAsText());
             }
             catch (Exception)
             {

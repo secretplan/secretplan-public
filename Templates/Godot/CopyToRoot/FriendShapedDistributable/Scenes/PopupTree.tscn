@@ -1,0 +1,12 @@
+[gd_scene format=3 uid="uid://2vb6wkr44f3q"]
+
+[ext_resource type="Script" uid="uid://cxmugxcxstwjf" path="res://FriendShapedPlugin/PopupTree.cs" id="1_vh10n"]
+
+[node name="PopupTree" type="Control" unique_id=661062461]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_vh10n")
+
+[node name="OpenSound" type="AudioStreamPlayer" parent="." unique_id=825107157]
+
+[node name="CloseSound" type="AudioStreamPlayer" parent="." unique_id=827649410]

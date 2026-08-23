@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://bq8obuwukj0rc"]
+
+[ext_resource type="Script" uid="uid://biy1kp6qkqqmo" path="res://FriendShapedPlugin/ConfigEditor/TextureReferenceEditor.cs" id="1_60pmx"]
+[ext_resource type="PackedScene" uid="uid://cc2vpbdvdmh2y" path="res://FriendShapedPlugin/ConfigEditor/Scenes/ResourceReferenceLink.tscn" id="2_kfuey"]
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_p0gg8"]
+
+[node name="TextureReferenceEditor" type="VBoxContainer" unique_id=350696447]
+offset_right = 551.0
+offset_bottom = 382.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("1_60pmx")
+
+[node name="ResourceReferenceLink" parent="." unique_id=603760175 instance=ExtResource("2_kfuey")]
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="." unique_id=782480820]
+custom_minimum_size = Vector2(0, 250)
+layout_mode = 2
+size_flags_vertical = 3
+texture = SubResource("NoiseTexture2D_p0gg8")
+expand_mode = 1
+stretch_mode = 5

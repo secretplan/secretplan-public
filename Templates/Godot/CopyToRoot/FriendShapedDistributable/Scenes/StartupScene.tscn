@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://dvxqu6kr2eqlu"]
+
+[ext_resource type="Script" uid="uid://kwdpuer1qjjt" path="res://FriendShapedDistributable/StartupScene.cs" id="1_l80sp"]
+[ext_resource type="Texture2D" uid="uid://djc55io3suvgv" path="res://Art/FriendShapedLogo8.png" id="1_n0orr"]
+
+[node name="StartupScene" type="Node" unique_id=2028162031]
+script = ExtResource("1_l80sp")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=33890647]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.029907245, 0.30174974, 0.37275195, 1)
+
+[node name="TextureRect" type="TextureRect" parent="." unique_id=293229359]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_n0orr")
+stretch_mode = 3

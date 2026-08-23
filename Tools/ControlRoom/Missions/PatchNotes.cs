@@ -1,5 +1,5 @@
-﻿using ControlRoom.Core;
-using ControlRoom.Programs;
+﻿using ControlRoomLib.Core;
+using ControlRoomLib.Programs;
 using Newtonsoft.Json;
 using SecretPlanCore.Core;
 
@@ -7,7 +7,7 @@ namespace ControlRoom.Missions;
 
 public class PatchNotes : Mission
 {
-    public PatchNotes(List<string> rawArgs) : base(rawArgs)
+    public PatchNotes(List<string> rawArgs, MissionVariables missionVariables) : base(rawArgs, missionVariables)
     {
     }
 
@@ -19,9 +19,9 @@ public class PatchNotes : Mission
 
         var virtualRepo = await VirtualRepo.GetAndInitialize();
 
-        Constants.WorkingDirectoryFiles.WriteToFile(Constants.PatchNotesFile,
+        ControlRoomConstants.WorkingDirectoryFiles.WriteToFile(ControlRoomConstants.PatchNotesFile,
             await GeneratePatchNotesFile(
-                Constants.AppIdFlockAroundFullGame, GameDirectory, virtualRepo.Files, virtualRepo.Git));
+                ControlRoomConstants.FlockAroundFullGame, GameDirectory, virtualRepo.Files, virtualRepo.Git));
     }
 
     public static async Task<string[]> GeneratePatchNotesFile(SteamBuildInfo buildInfo, string gameDirectory,
@@ -41,8 +41,8 @@ public class PatchNotes : Mission
 
         var sourceBranch = await git.GetBranchInfo(sourceBranchName);
         var cacheFilePath = $"Local/{nameof(PatchNotes)}_{gameDirectory}_{sourceBranchName}_cache";
-        var cache = await Constants.JsonDeserializeSafe<Cache>(
-                        await Constants.WorkingDirectoryFiles.ReadFileAsync(cacheFilePath)) ??
+        var cache = await ControlRoomConstants.JsonDeserializeSafe<Cache>(
+                        await ControlRoomConstants.WorkingDirectoryFiles.ReadFileAsync(cacheFilePath)) ??
                     new Cache();
 
         await OutPipe.AgentLogMessage("Fetching branches");
@@ -69,7 +69,7 @@ public class PatchNotes : Mission
                 throw new MissionFailedException($"Could not find version of branch {fork.ForkBranch}");
             }
 
-            var releaseBranchVersion = await Constants.JsonDeserializeSafe<SecretPlanVersion>(versionContent);
+            var releaseBranchVersion = await ControlRoomConstants.JsonDeserializeSafe<SecretPlanVersion>(versionContent);
 
             if (releaseBranchVersion == null)
             {
@@ -125,13 +125,13 @@ public class PatchNotes : Mission
             if (isRelevantCommit)
             {
                 patchNotesLines.Add(
-                    $"- {commit.Message} (by {commit.Author} [See Commit]({Constants.GitHubWebCommitUrl(commit.Sha)}))");
+                    $"- {commit.Message} (by {commit.Author} [See Commit]({ControlRoomConstants.GitHubWebCommitUrl(commit.Sha)}))");
             }
 
             cache.CommitRelevance[commit.Sha] = isRelevantCommit;
         }
 
-        Constants.WorkingDirectoryFiles.WriteToFile(cacheFilePath, JsonConvert.SerializeObject(cache, Formatting.Indented));
+        ControlRoomConstants.WorkingDirectoryFiles.WriteToFile(cacheFilePath, JsonConvert.SerializeObject(cache, Formatting.Indented));
 
         git.LogLevel = LogLevel.ConsoleAndLogFile;
         return patchNotesLines.ToArray();

@@ -1,0 +1,50 @@
+[gd_scene format=3 uid="uid://cc2vpbdvdmh2y"]
+
+[ext_resource type="Script" uid="uid://pltkgh1bph62" path="res://FriendShapedPlugin/ConfigEditor/ResourceReferenceLink.cs" id="1_ogvgn"]
+[ext_resource type="Script" uid="uid://uvct7h8fmjlh" path="res://FriendShapedPlugin/ControlSizeProxy.cs" id="2_fxxwt"]
+
+[node name="AssetReferenceEditor" type="HBoxContainer" unique_id=1096877373]
+offset_right = 535.0
+offset_bottom = 36.0
+script = ExtResource("1_ogvgn")
+
+[node name="SizeProxy" type="Control" parent="." unique_id=1715085863 node_paths=PackedStringArray("_controlToGetSizeFrom")]
+layout_mode = 2
+size_flags_horizontal = 3
+script = ExtResource("2_fxxwt")
+_controlToGetSizeFrom = NodePath("SizeProxyDriver")
+
+[node name="Button" type="Button" parent="SizeProxy" unique_id=1528506480]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="SizeProxyDriver" type="HBoxContainer" parent="SizeProxy" unique_id=1165083093]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_right = -8.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_behavior_recursive = 1
+
+[node name="PathLabel" type="Label" parent="SizeProxy/SizeProxyDriver" unique_id=330295372]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 28
+text = "res://some/path/goes/here"
+
+[node name="Control" type="Control" parent="SizeProxy/SizeProxyDriver" unique_id=1334740495]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="FolderIconLabel" type="Label" parent="SizeProxy/SizeProxyDriver" unique_id=25386085]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.69875443, 0.72337097, 0.6830083, 1)
+theme_override_font_sizes/font_size = 28
+text = "📂"

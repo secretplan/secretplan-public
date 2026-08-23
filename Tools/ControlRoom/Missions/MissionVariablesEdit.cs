@@ -1,5 +1,5 @@
 using System.Reflection;
-using ControlRoom.Core;
+using ControlRoomLib.Core;
 using SecretPlanCore.ArgumentParsing;
 using SecretPlanCore.Core;
 
@@ -7,7 +7,7 @@ namespace ControlRoom.Missions;
 
 public class MissionVariablesEdit : Mission
 {
-    public MissionVariablesEdit(List<string> rawArgs) : base(rawArgs)
+    public MissionVariablesEdit(List<string> rawArgs, MissionVariables missionVariables) : base(rawArgs, missionVariables)
     {
     }
 
@@ -41,7 +41,7 @@ public class MissionVariablesEdit : Mission
                 foreach (var (key, propertyInfo) in nameToProperty)
                 {
                     await OutPipe.AgentLogMessage(
-                        $"{key} ({propertyInfo.PropertyType.Name}) = {Constants.HumanReadableStringify(propertyInfo.GetValue(MissionVariables))}");
+                        $"{key} ({propertyInfo.PropertyType.Name}) = {ControlRoomConstants.HumanReadableStringify(propertyInfo.GetValue(MissionVariables))}");
                 }
 
                 break;

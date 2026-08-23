@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://pnk02fbaujvc"]
+
+[ext_resource type="Script" uid="uid://b7188kby5v5ec" path="res://FriendShapedPlugin/ConfigEditor/LocalizationIdAndTranslationEditor.cs" id="1_qkcvs"]
+[ext_resource type="PackedScene" uid="uid://bxr86dlhbftis" path="res://FriendShapedPlugin/ConfigEditor/Scenes/StringFieldEditor.tscn" id="2_ftxva"]
+
+[node name="IdAndTranslationEditor" type="VBoxContainer" unique_id=1556864941]
+offset_right = 382.0
+offset_bottom = 170.0
+size_flags_horizontal = 3
+script = ExtResource("1_qkcvs")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=546315407]
+layout_mode = 2
+
+[node name="Button" type="Button" parent="HBoxContainer" unique_id=36981878]
+layout_mode = 2
+text = "📃"
+
+[node name="Label" type="Label" parent="HBoxContainer" unique_id=833885277]
+layout_mode = 2
+text = "slug.goes.here"
+
+[node name="TranslationEditor" parent="." unique_id=428767988 instance=ExtResource("2_ftxva")]
+layout_mode = 2

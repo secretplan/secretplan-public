@@ -27,7 +27,12 @@ public class ResourceReference<T> : IResourceReference where T : Resource
     public string Path { get; init; } = string.Empty;
 
     [JsonIgnore]
-    public Type ResourceType => typeof(T); 
+    public Type ResourceType => typeof(T);
+
+    public object? GetOrLoadOrNullTypeless()
+    {
+        return CachedResource.GetOrLoadOrNull();
+    }
 
     public static implicit operator T?(ResourceReference<T>? self)
     {

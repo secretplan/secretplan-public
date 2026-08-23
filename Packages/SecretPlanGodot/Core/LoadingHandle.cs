@@ -6,19 +6,15 @@ namespace SecretPlanGodot.Core;
 public class LoadingHandle
 {
     private readonly Func<(ResourceLoader.ThreadLoadStatus, float)> _getStatusFunc;
-    private readonly Action _onFinished;
     private readonly string _label;
+    private readonly Action _onFinished;
     private readonly Func<Error> _start;
-
-    private int _startDelayFrames = 2;
     private int _finishDelayFrames = 5;
 
-    public override string ToString()
-    {
-        return $"Loading Handle for {_label}";
-    }
+    private int _startDelayFrames = 2;
 
-    public LoadingHandle(string label, Func<Error> start, Func<(ResourceLoader.ThreadLoadStatus, float)> getStatusFunc, Action onFinished)
+    public LoadingHandle(string label, Func<Error> start, Func<(ResourceLoader.ThreadLoadStatus, float)> getStatusFunc,
+        Action onFinished)
     {
         _label = label;
         _start = start;
@@ -26,12 +22,17 @@ public class LoadingHandle
         _onFinished = onFinished;
     }
 
+    public override string ToString()
+    {
+        return _label;
+    }
+
     public ResourceLoader.ThreadLoadStatus Poll()
     {
         if (_startDelayFrames > 0)
         {
             _startDelayFrames--;
-            
+
             if (_startDelayFrames == 0)
             {
                 LocalClient.Print($"Starting load for: {_label}");
@@ -44,10 +45,10 @@ public class LoadingHandle
 
                 LocalClient.Print("Load started, will come back when it's finished");
             }
-            
+
             return ResourceLoader.ThreadLoadStatus.InProgress;
         }
-        
+
         var (status, _) = _getStatusFunc();
         if (status == ResourceLoader.ThreadLoadStatus.Loaded && _finishDelayFrames > 0)
         {
@@ -69,5 +70,14 @@ public class LoadingHandle
     {
         var (status, percent) = _getStatusFunc();
         return percent;
+    }
+
+    public static LoadingHandle Instant(string label)
+    {
+        return new LoadingHandle(label,
+            () => Error.Ok,
+            () => (ResourceLoader.ThreadLoadStatus.Loaded, 1f),
+            () => { }
+        );
     }
 }

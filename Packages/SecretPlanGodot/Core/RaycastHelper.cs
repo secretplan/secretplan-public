@@ -3,16 +3,26 @@ using Godot.Collections;
 
 namespace SecretPlanGodot.Core;
 
+public readonly struct ShapeCastResult3D
+{
+    public Rid Rid { get; init; }
+    public int ShapeIndex { get; init; }
+    public GodotObject? FoundBody { get; init; }
+    public Vector3 Normal { get; init; }
+    public Vector3 CollisionPoint { get; init; }
+    public bool FoundSomething { get; init; }
+}
+
 public readonly struct RaycastResult3D
 {
-    public Rid Rid { get; }
-    public Vector3 Position { get; }
-    public Vector3 Normal { get; }
-    public Variant FaceIndex { get; }
-    public int ColliderId { get; }
-    public GodotObject? FoundBody { get; }
-    public int ShapeIndex { get; }
-    public bool FoundSomething { get; }
+    public Rid Rid { get; init; }
+    public Vector3 HitPosition { get; init; }
+    public Vector3 Normal { get; init; }
+    public Variant FaceIndex { get; init; }
+    public int ColliderId { get; init; }
+    public GodotObject? FoundBody { get; init; }
+    public int ShapeIndex { get; init; }
+    public bool FoundSomething { get; init; }
 
 
     /// <summary>
@@ -29,7 +39,7 @@ public readonly struct RaycastResult3D
 
         FoundSomething = true;
 
-        Position = (Vector3)dictionary["position"];
+        HitPosition = (Vector3)dictionary["position"];
         Normal = (Vector3)dictionary["normal"];
         FaceIndex = dictionary["face_index"];
 

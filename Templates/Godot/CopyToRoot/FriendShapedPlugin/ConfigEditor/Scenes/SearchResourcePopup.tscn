@@ -1,0 +1,23 @@
+[gd_scene load_steps=4 format=3 uid="uid://dpms6brktk43n"]
+
+[ext_resource type="Theme" uid="uid://di5wu2ydonwwf" path="res://FriendShapedPlugin/ConfigEditor/Scenes/ConfigEditorTheme.tres" id="1_h4ist"]
+[ext_resource type="Script" uid="uid://dmi6p5eq0biio" path="res://FriendShapedPlugin/ConfigEditor/Scenes/ResourceSearchPopup.cs" id="2_h4ist"]
+[ext_resource type="PackedScene" uid="uid://bnx8505pi6k64" path="res://FriendShapedPlugin/ConfigEditor/Scenes/QuickSearchController.tscn" id="3_utbeh"]
+
+[node name="SearchResourcePopup" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme = ExtResource("1_h4ist")
+script = ExtResource("2_h4ist")
+
+[node name="QuickSearchController" parent="." instance=ExtResource("3_utbeh")]
+layout_mode = 1
+offset_top = -179.5
+offset_bottom = 179.5
+metadata/_edit_use_anchors_ = true

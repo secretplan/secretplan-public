@@ -11,10 +11,10 @@
     <ItemGroup>
         <ProjectReference Include="..\..\Packages\SecretPlanCore\SecretPlanCore.csproj" />
         <ProjectReference Include="..\..\Packages\SecretPlanGodot\SecretPlanGodot.csproj" />
+        <ProjectReference Include="..\ControlRoomLib\ControlRoomLib.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="CsvHelper" Version="33.1.0" />
       <PackageReference Include="JetBrains.Annotations" Version="2025.2.4" />
       <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     </ItemGroup>

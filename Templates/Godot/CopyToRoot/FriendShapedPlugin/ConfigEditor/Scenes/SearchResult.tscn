@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=3 uid="uid://c4daj6aqp332i"]
+
+[ext_resource type="Theme" uid="uid://di5wu2ydonwwf" path="res://FriendShapedPlugin/ConfigEditor/Scenes/ConfigEditorTheme.tres" id="1_kjlba"]
+[ext_resource type="Script" uid="uid://fm35hywx8g61" path="res://FriendShapedPlugin/ConfigEditor/Scenes/SearchResultButton.cs" id="2_hfo01"]
+
+[node name="SearchResult" type="Button"]
+offset_right = 275.0
+offset_bottom = 41.0
+theme = ExtResource("1_kjlba")
+text = "result"
+flat = true
+alignment = 0
+script = ExtResource("2_hfo01")

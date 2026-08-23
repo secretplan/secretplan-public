@@ -1,0 +1,14 @@
+[gd_scene load_steps=2 format=3 uid="uid://bxr86dlhbftis"]
+
+[ext_resource type="Script" uid="uid://ljiwm7dhtipv" path="res://FriendShapedPlugin/ConfigEditor/Scenes/StringEditor.cs" id="1_76lhj"]
+
+[node name="Control" type="HBoxContainer"]
+offset_right = 180.0
+offset_bottom = 49.0
+size_flags_horizontal = 3
+script = ExtResource("1_76lhj")
+
+[node name="LineEdit" type="LineEdit" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "23"

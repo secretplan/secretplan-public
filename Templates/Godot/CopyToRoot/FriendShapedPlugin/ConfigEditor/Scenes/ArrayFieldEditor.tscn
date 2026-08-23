@@ -1,0 +1,21 @@
+[gd_scene load_steps=3 format=3 uid="uid://bn4ww8tl33lke"]
+
+[ext_resource type="Script" uid="uid://rck3amhopqkb" path="res://FriendShapedPlugin/ConfigEditor/Scenes/ArrayEditor.cs" id="1_s7x7j"]
+[ext_resource type="PackedScene" uid="uid://6jpprkksw0ep" path="res://FriendShapedPlugin/ConfigEditor/Scenes/ArrayElement.tscn" id="1_x7r6a"]
+
+[node name="ArrayFieldEditor" type="VBoxContainer"]
+size_flags_horizontal = 3
+script = ExtResource("1_s7x7j")
+
+[node name="ArrayContent" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="ArrayElement" parent="ArrayContent" instance=ExtResource("1_x7r6a")]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 3
+
+[node name="AddButton" type="Button" parent="."]
+layout_mode = 2
+size_flags_vertical = 3
+text = "➕"

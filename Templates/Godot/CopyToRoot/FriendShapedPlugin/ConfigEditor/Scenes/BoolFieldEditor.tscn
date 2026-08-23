@@ -1,0 +1,14 @@
+[gd_scene load_steps=2 format=3 uid="uid://cawcb70j2xubh"]
+
+[ext_resource type="Script" uid="uid://b5cg8cipb28e2" path="res://FriendShapedPlugin/ConfigEditor/Scenes/BoolEditor.cs" id="1_tmumf"]
+
+[node name="BoolFieldEditor" type="HBoxContainer"]
+offset_right = 465.0
+offset_bottom = 77.0
+size_flags_horizontal = 3
+script = ExtResource("1_tmumf")
+
+[node name="Button" type="Button" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "True"

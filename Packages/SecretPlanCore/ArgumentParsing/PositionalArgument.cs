@@ -166,4 +166,60 @@ public readonly record struct PositionalArgument(
         throw new ArgParseFailedException(this,
             $"Could not parse `{OriginalToken}` as any of: {string.Join(", ", Enum.GetNames<T>())}");
     }
+
+    public object ParseAsEnumNonGeneric(Type enumType)
+    {
+        if (!enumType.IsEnum)
+        {
+            throw new Exception("ParseAsEnumNonGeneric was passed a type that was not an enum");
+        }
+        
+        if (Enum.TryParse(enumType, OriginalToken, true, out var enumResult))
+        {
+            return enumResult;
+        }
+        
+        throw new ArgParseFailedException(this,
+            $"Could not parse `{OriginalToken}` as any of: {string.Join(", ", Enum.GetNames(enumType))}");
+    }
+
+    public object ParseAsType(Type type)
+    {
+        if (type == typeof(bool))
+        {
+            return ParseAsBool();
+        }
+
+        if (type == typeof(int))
+        {
+            return ParseAsInt();
+        }
+
+        if (type == typeof(float))
+        {
+            return ParseAsFloat();
+        }
+
+        if (type.IsEnum)
+        {
+            return ParseAsEnumNonGeneric(type);
+        }
+
+        if (type == typeof(uint))
+        {
+            return ParseAsUInt();
+        }
+
+        if (type == typeof(ulong))
+        {
+            return ParseAsULong();
+        }
+
+        if (type == typeof(string))
+        {
+            return ParseAsString();
+        }
+        
+        throw new ArgParseFailedException(this, $"Unsupported type {type.Name}");
+    }
 }

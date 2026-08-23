@@ -1,0 +1,65 @@
+[gd_scene format=3 uid="uid://dpd383iehpoy4"]
+
+[ext_resource type="Script" uid="uid://7eyr68k7wqas" path="res://Scripts/ConfigEditor/ConfigEditor.cs" id="1_frejv"]
+[ext_resource type="PackedScene" uid="uid://dsra8lc0jxt5k" path="res://FriendShapedPlugin/ConfigEditor/Scenes/ConfigInstancePane.tscn" id="1_rv0vl"]
+[ext_resource type="Theme" uid="uid://di5wu2ydonwwf" path="res://FriendShapedPlugin/ConfigEditor/Scenes/ConfigEditorTheme.tres" id="1_y7ui5"]
+[ext_resource type="Script" uid="uid://iy2gtbj66pay" path="res://Scripts/ConfigEditor/OnlyScrollOnShift.cs" id="3_1bhda"]
+
+[node name="ConfigEditor" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_y7ui5")
+script = ExtResource("1_frejv")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.0885599, 0.0885599, 0.0885599, 1)
+
+[node name="Stack" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Scroll" type="ScrollContainer" parent="Stack"]
+layout_mode = 2
+size_flags_vertical = 3
+script = ExtResource("3_1bhda")
+
+[node name="MainContainer" type="HBoxContainer" parent="Stack/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Panes" type="HBoxContainer" parent="Stack/Scroll/MainContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ConfigInstancePane" parent="Stack/Scroll/MainContainer/Panes" instance=ExtResource("1_rv0vl")]
+layout_mode = 2
+
+[node name="Margin" type="MarginContainer" parent="Stack/Scroll/MainContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="OpenButton" type="Button" parent="Stack/Scroll/MainContainer/Margin"]
+custom_minimum_size = Vector2(100, 96)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Click to Open Config"
+flat = true

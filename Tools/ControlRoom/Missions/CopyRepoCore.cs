@@ -1,12 +1,14 @@
 ﻿using System.Text;
-using ControlRoom.Core;
+using ControlRoomLib.BaseMissions;
+using ControlRoomLib.Core;
+using ControlRoomLib.Missions;
 using SecretPlanCore.Core;
 
 namespace ControlRoom.Missions;
 
 public class CopyRepoCore : Mission
 {
-    public CopyRepoCore(List<string> rawArgs) : base(rawArgs)
+    public CopyRepoCore(List<string> rawArgs, MissionVariables missionVariables) : base(rawArgs, missionVariables)
     {
     }
 
@@ -72,10 +74,11 @@ public class CopyRepoCore : Mission
             nameof(PruneBranches),
             nameof(Shortcut),
             nameof(VersionChange),
-            nameof(ConfigWorkbench),
+            nameof(ConfigManagement),
             nameof(AsepriteAtlas),
             nameof(CopyRepoCore),
-            nameof(DownloadLatest)
+            nameof(DownloadLatest),
+            nameof(Repl)
         ];
 
         var missionFiles = destinationRepo.Files.GetDirectory("Tools/ControlRoom/Missions");

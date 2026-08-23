@@ -1,0 +1,27 @@
+[gd_scene load_steps=3 format=3 uid="uid://crny025gbyuqv"]
+
+[ext_resource type="PackedScene" uid="uid://drbi2elx5en1s" path="res://FriendShapedPlugin/ConfigEditor/Scenes/LocStringLink.tscn" id="1_21ro6"]
+[ext_resource type="Script" uid="uid://c7tq3jesbmw3i" path="res://FriendShapedPlugin/ConfigEditor/Scenes/LocStringReferenceEditor.cs" id="1_nexwo"]
+
+[node name="LocStringEditor" type="VBoxContainer"]
+offset_right = 604.0
+offset_bottom = 78.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("1_nexwo")
+
+[node name="LocStringLink" parent="." instance=ExtResource("1_21ro6")]
+layout_mode = 2
+
+[node name="PreviewContainer" type="HBoxContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Preview" type="RichTextLabel" parent="PreviewContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+bbcode_enabled = true
+text = "[color=gray][en]:[/color] Translation goes here"
+fit_content = true
+scroll_active = false

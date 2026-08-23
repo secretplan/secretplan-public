@@ -1,0 +1,24 @@
+[gd_scene load_steps=3 format=3 uid="uid://6jpprkksw0ep"]
+
+[ext_resource type="PackedScene" uid="uid://dvbugpc1awhh6" path="res://FriendShapedPlugin/ConfigEditor/Scenes/ArrayElementControls.tscn" id="1_rq6xe"]
+[ext_resource type="Script" uid="uid://c67hxfyh2adib" path="res://FriendShapedPlugin/ConfigEditor/Scenes/ArrayElementDisplay.cs" id="1_w87tt"]
+
+[node name="ArrayElement" type="PanelContainer"]
+size_flags_horizontal = 3
+script = ExtResource("1_w87tt")
+
+[node name="Root" type="HBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="EditorContent" type="VBoxContainer" parent="Root"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Button" type="Button" parent="Root/EditorContent"]
+layout_mode = 2
+size_flags_vertical = 3
+text = "some content"
+
+[node name="ArrayElementControls" parent="Root" instance=ExtResource("1_rq6xe")]
+layout_mode = 2
+size_flags_horizontal = 1

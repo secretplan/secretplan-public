@@ -1,0 +1,23 @@
+[gd_scene format=3 uid="uid://5gbebypvryky"]
+
+[ext_resource type="PackedScene" uid="uid://cc2vpbdvdmh2y" path="res://FriendShapedPlugin/ConfigEditor/Scenes/ResourceReferenceLink.tscn" id="1_5mwpn"]
+[ext_resource type="Script" uid="uid://csx5bwsowbj7s" path="res://FriendShapedPlugin/ConfigEditor/AudioStreamReferenceEditor.cs" id="1_erjui"]
+
+[node name="AudioStreamField" type="VBoxContainer" unique_id=949697748]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("1_erjui")
+
+[node name="ResourceReferenceLink" parent="." unique_id=1362326574 instance=ExtResource("1_5mwpn")]
+layout_mode = 2
+
+[node name="AudioStreamReferenceEditor" type="HBoxContainer" parent="." unique_id=1021232765]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="PlayButton" type="Button" parent="AudioStreamReferenceEditor" unique_id=1670484071]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "▶️"
+
+[node name="Player" type="AudioStreamPlayer" parent="." unique_id=396128089]

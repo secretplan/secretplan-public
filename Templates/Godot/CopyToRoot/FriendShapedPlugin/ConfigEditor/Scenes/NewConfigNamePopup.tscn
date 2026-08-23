@@ -1,0 +1,51 @@
+[gd_scene format=3 uid="uid://ciq7jr3g34gwp"]
+
+[ext_resource type="Theme" uid="uid://di5wu2ydonwwf" path="res://FriendShapedPlugin/ConfigEditor/Scenes/ConfigEditorTheme.tres" id="1_7b74w"]
+[ext_resource type="Script" uid="uid://hqmlci86v2wg" path="res://FriendShapedPlugin/ConfigEditor/NewConfigNamePopup.cs" id="2_7b74w"]
+[ext_resource type="Script" uid="uid://bk2obcvyifksq" path="res://FriendShapedPlugin/PopupCloseButton.cs" id="4_30mr0"]
+
+[node name="NewConfigNamePopup" type="Control" unique_id=264040721]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme = ExtResource("1_7b74w")
+script = ExtResource("2_7b74w")
+
+[node name="Root" type="PanelContainer" parent="." unique_id=1088733702]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -258.0
+offset_top = -77.5
+offset_right = 258.0
+offset_bottom = 77.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Stack" type="VBoxContainer" parent="Root" unique_id=284911025]
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Root/Stack" unique_id=2035067560]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Root/Stack/HBoxContainer" unique_id=1246248604]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Name New Config"
+
+[node name="LineEdit" type="LineEdit" parent="Root/Stack" unique_id=1206860008]
+layout_mode = 2
+
+[node name="Button" type="Button" parent="Root/Stack" unique_id=1840846738]
+layout_mode = 2
+text = "Cancel"
+script = ExtResource("4_30mr0")

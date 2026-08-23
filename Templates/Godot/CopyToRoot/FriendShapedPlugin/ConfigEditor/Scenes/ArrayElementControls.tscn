@@ -1,0 +1,19 @@
+[gd_scene load_steps=2 format=3 uid="uid://dvbugpc1awhh6"]
+
+[ext_resource type="Script" uid="uid://cjabtg4ue8sge" path="res://FriendShapedPlugin/ConfigEditor/Scenes/ArrayElementControls.cs" id="1_hoot2"]
+
+[node name="ArrayElementControls" type="VBoxContainer"]
+size_flags_horizontal = 3
+script = ExtResource("1_hoot2")
+
+[node name="UpButton" type="Button" parent="."]
+layout_mode = 2
+text = "⬆️"
+
+[node name="DownButton" type="Button" parent="."]
+layout_mode = 2
+text = "⬇️"
+
+[node name="DeleteButton" type="Button" parent="."]
+layout_mode = 2
+text = "✖️"

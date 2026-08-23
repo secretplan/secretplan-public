@@ -109,13 +109,18 @@ public static class NodeExtensions
         }
     }
 
-    public static bool IsValid([NotNullWhen(true)] this Node? node)
+    public static bool IsValidExactly([NotNullWhen(true)] this Node? node)
+    {
+        return node != null && GodotObject.IsInstanceValid(node);
+    }
+    
+    public static bool IsValidAndNotQueuedForDeletion([NotNullWhen(true)] this Node? node)
     {
         return node != null && GodotObject.IsInstanceValid(node) && !node.IsQueuedForDeletion();
     }
 
     public static bool IsValidAndInsideTree([NotNullWhen(true)] this Node? node)
     {
-        return node.IsValid() && node.IsInsideTree();
+        return node.IsValidExactly() && node.IsInsideTree();
     }
 }

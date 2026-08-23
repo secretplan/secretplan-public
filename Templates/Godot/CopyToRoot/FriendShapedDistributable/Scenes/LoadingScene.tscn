@@ -1,0 +1,33 @@
+[gd_scene format=3 uid="uid://gwiykxquwkox"]
+
+[ext_resource type="Script" uid="uid://3fcerqx2hcnn" path="res://FriendShapedDistributable/LoadingScrim.cs" id="1_qk3q4"]
+
+[node name="Loading" type="Control" unique_id=1453434797]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_qk3q4")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=1743298926]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.108834974, 0.34575692, 0.47594237, 1)
+
+[node name="Label" type="Label" parent="." unique_id=2063298456]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 128
+text = "Loading"
+horizontal_alignment = 1
+vertical_alignment = 1

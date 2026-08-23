@@ -1,0 +1,57 @@
+[gd_scene format=3 uid="uid://dg7nqwhocjwd5"]
+
+[ext_resource type="Script" uid="uid://ck2fn8s5nbl84" path="res://FriendShapedPlugin/ConfigEditor/ConfigReferenceEditor.cs" id="1_i3458"]
+[ext_resource type="Script" uid="uid://uvct7h8fmjlh" path="res://FriendShapedPlugin/ControlSizeProxy.cs" id="2_qejyy"]
+
+[node name="ConfigReferenceEditor" type="HBoxContainer" unique_id=2110126259]
+offset_right = 626.0
+offset_bottom = 51.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("1_i3458")
+
+[node name="SizeProxy" type="Control" parent="." unique_id=1003006685 node_paths=PackedStringArray("_controlToGetSizeFrom")]
+layout_mode = 2
+size_flags_horizontal = 3
+script = ExtResource("2_qejyy")
+_controlToGetSizeFrom = NodePath("SizeProxyDriver")
+
+[node name="Button" type="Button" parent="SizeProxy" unique_id=2125684277]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="SizeProxyDriver" type="HBoxContainer" parent="SizeProxy" unique_id=1260120313]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_right = -8.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_behavior_recursive = 1
+
+[node name="PathLabel" type="Label" parent="SizeProxy/SizeProxyDriver" unique_id=1692334703]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 28
+text = "res://some/path/goes/here"
+
+[node name="Control" type="Control" parent="SizeProxy/SizeProxyDriver" unique_id=806641727]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="FolderIconLabel" type="Label" parent="SizeProxy/SizeProxyDriver" unique_id=641653869]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.69875443, 0.72337097, 0.6830083, 1)
+theme_override_font_sizes/font_size = 28
+text = "🔗"
+
+[node name="ExploreButton" type="Button" parent="." unique_id=923820801]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "🔧"

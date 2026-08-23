@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://bk1qx0yag4e6v"]
+
+[ext_resource type="Script" uid="uid://ctpe5ecr4e5ci" path="res://FriendShapedPlugin/ConfigEditor/EnumEditor.cs" id="1_mwfo1"]
+
+[node name="EnumFieldEditor" type="HBoxContainer" unique_id=1705848922]
+offset_right = 199.0
+offset_bottom = 49.0
+size_flags_horizontal = 3
+script = ExtResource("1_mwfo1")
+
+[node name="OptionButton" type="OptionButton" parent="." unique_id=789638685]
+layout_mode = 2
+size_flags_horizontal = 3
+selected = 0
+item_count = 3
+popup/item_0/text = "test"
+popup/item_0/id = 0
+popup/item_1/text = "test2"
+popup/item_1/id = 1
+popup/item_2/text = "test3"
+popup/item_2/id = 2

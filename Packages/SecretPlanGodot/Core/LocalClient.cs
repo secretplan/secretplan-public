@@ -1,16 +1,19 @@
-﻿using System.Security.Cryptography;
-using System.Text;
+﻿using System.Text;
 using Godot;
 using SecretPlanCore.Core;
+using Environment = System.Environment;
 
 namespace SecretPlanGodot.Core;
 
 public static class LocalClient
 {
+    private static bool? _isModdingEnabled;
     private static bool? _isAllowedLocalHost;
     private static bool? _isDev;
     private static string? _cachedUniqueId;
     private static Color? _cachedColor;
+
+    public static bool IsModdingEnabled => _isModdingEnabled ??= HasCommandLineFlag("--enablemods");
 
     private static readonly string _generatedUniqueId = Guid.NewGuid().ToString().Substring(0, 5);
 
@@ -58,7 +61,7 @@ public static class LocalClient
 
     public static void Print(params object?[] originalMessage)
     {
-        PrintInternal("",originalMessage);
+        PrintInternal("", originalMessage);
     }
 
     public static void Error(params object?[] originalMessage)
@@ -80,7 +83,7 @@ public static class LocalClient
             " [color=",
             colorString,
             "]#[/color] ",
-            prefix,
+            prefix
         };
 
         newMessage.AddRange(originalMessage.Select(a =>
@@ -110,4 +113,29 @@ public static class LocalClient
     }
 
     public static event Action<string>? OnMessage;
+
+    public static void LogInit()
+    {
+        Print("True Args: ", string.Join(" ", Environment.GetCommandLineArgs().Select(a => $"[{a}]")));
+        Print("User Args: ", string.Join(" ", OS.GetCmdlineUserArgs().Select(a => $"[{a}]")));
+        Print($"Version is: {VersionManager.GetVersion()}");
+
+        Print($"Godot Version: {GetGodotVersion()}");
+        Print($"Local Time: {DateTime.Now:g}");
+        Print($"UTC Time: {DateTime.UtcNow:g}");
+
+        PerfClamps.Print += Print;
+    }
+
+
+    private static string GetGodotVersion()
+    {
+        var godotVersionInfo = Engine.GetVersionInfo();
+        if (godotVersionInfo.TryGetValue("string", out var version))
+        {
+            return version.AsString();
+        }
+
+        return "???";
+    }
 }

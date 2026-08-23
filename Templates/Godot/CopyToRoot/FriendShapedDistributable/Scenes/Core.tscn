@@ -1,0 +1,64 @@
+[gd_scene format=3 uid="uid://c3amdtedufkbw"]
+
+[ext_resource type="Script" uid="uid://tdf8x71crmpt" path="res://FriendShapedDistributable/GameCore.cs" id="1_5sg0h"]
+[ext_resource type="Script" uid="uid://b3bimesrd048y" path="res://FriendShapedPlugin/SceneRoot.cs" id="2_npajd"]
+[ext_resource type="PackedScene" uid="uid://2vb6wkr44f3q" path="res://FriendShapedDistributable/Scenes/PopupTree.tscn" id="2_p7hct"]
+[ext_resource type="PackedScene" uid="uid://sha6mudf5ann" path="res://FriendShapedDistributable/Scenes/DeveloperConsole.tscn" id="3_bwlye"]
+[ext_resource type="PackedScene" uid="uid://gwiykxquwkox" path="res://FriendShapedDistributable/Scenes/LoadingScene.tscn" id="4_juvwa"]
+[ext_resource type="Script" uid="uid://cknt4dn1xefxo" path="res://FriendShapedPlugin/FramerateDisplay.cs" id="6_lkeuc"]
+[ext_resource type="Script" uid="uid://crbm1wf3644pg" path="res://FriendShapedPlugin/ClientIdDisplay.cs" id="7_4ulig"]
+
+[node name="Core" type="Node" unique_id=1180382485]
+script = ExtResource("1_5sg0h")
+
+[node name="CurrentScene" type="Node" parent="." unique_id=1676622614]
+script = ExtResource("2_npajd")
+
+[node name="DeveloperConsole" parent="." unique_id=905380729 instance=ExtResource("3_bwlye")]
+
+[node name="RolloverSound" type="AudioStreamPlayer" parent="." unique_id=1123381471]
+
+[node name="ClickSound" type="AudioStreamPlayer" parent="." unique_id=1065561907]
+
+[node name="PopupTree" parent="." unique_id=661062461 instance=ExtResource("2_p7hct")]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="LoadingScrim" parent="." unique_id=1453434797 instance=ExtResource("4_juvwa")]
+
+[node name="Debug" type="Control" parent="." unique_id=1561021177]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+mouse_behavior_recursive = 1
+
+[node name="Framerate" type="RichTextLabel" parent="Debug" unique_id=1345970984]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 45.0
+theme_override_constants/outline_size = 4
+text = "52"
+fit_content = true
+scroll_active = false
+script = ExtResource("6_lkeuc")
+
+[node name="RichTextLabel" type="RichTextLabel" parent="Debug" unique_id=445658066]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -40.0
+offset_bottom = 40.0
+grow_horizontal = 0
+theme_override_constants/outline_size = 3
+bbcode_enabled = true
+fit_content = true
+scroll_active = false
+script = ExtResource("7_4ulig")

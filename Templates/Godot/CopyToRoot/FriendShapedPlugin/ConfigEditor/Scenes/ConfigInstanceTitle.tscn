@@ -1,0 +1,16 @@
+[gd_scene load_steps=2 format=3 uid="uid://csrcfrpi1oktc"]
+
+[ext_resource type="Script" uid="uid://d0e4iqkhmqpct" path="res://FriendShapedPlugin/ConfigEditor/Scenes/ConfigInstanceTitleDisplay.cs" id="1_mknr7"]
+
+[node name="Control" type="VBoxContainer"]
+script = ExtResource("1_mknr7")
+
+[node name="InstanceName" type="Label" parent="."]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "BirdSpecies_Robin"
+
+[node name="InstanceInfo" type="Label" parent="."]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "BirdSpecies 1635400471"

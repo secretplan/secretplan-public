@@ -1,0 +1,36 @@
+[gd_scene format=3 uid="uid://sha6mudf5ann"]
+
+[ext_resource type="Script" uid="uid://dcvdbn45cc3wq" path="res://FriendShapedPlugin/DeveloperConsole.cs" id="1_n1hwt"]
+
+[node name="DeveloperConsole" type="Node" unique_id=905380729]
+script = ExtResource("1_n1hwt")
+
+[node name="Layer" type="CanvasLayer" parent="." unique_id=301159168]
+layer = 1000
+
+[node name="Root" type="Control" parent="Layer" unique_id=1463628922]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="Layer/Root" unique_id=2054826691]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 404.0
+grow_horizontal = 2
+
+[node name="Stack" type="VBoxContainer" parent="Layer/Root/PanelContainer" unique_id=37693444]
+layout_mode = 2
+
+[node name="MessageHistory" type="RichTextLabel" parent="Layer/Root/PanelContainer/Stack" unique_id=1620240031]
+layout_mode = 2
+size_flags_vertical = 3
+bbcode_enabled = true
+scroll_following = true
+
+[node name="Input" type="LineEdit" parent="Layer/Root/PanelContainer/Stack" unique_id=1959176742]
+layout_mode = 2

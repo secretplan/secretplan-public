@@ -1,0 +1,43 @@
+[gd_scene load_steps=4 format=3 uid="uid://bia3ieb4v8511"]
+
+[ext_resource type="Theme" uid="uid://di5wu2ydonwwf" path="res://FriendShapedPlugin/ConfigEditor/Scenes/ConfigEditorTheme.tres" id="1_4b7lu"]
+[ext_resource type="Script" uid="uid://dcwsxc5fe6xfp" path="res://FriendShapedPlugin/ConfigEditor/Scenes/LocStringSearchPopup.cs" id="2_4b7lu"]
+[ext_resource type="PackedScene" uid="uid://bnx8505pi6k64" path="res://FriendShapedPlugin/ConfigEditor/Scenes/QuickSearchController.tscn" id="3_m0lym"]
+
+[node name="ConfigSearchPopup" type="HBoxContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 260.0
+offset_top = 89.0
+offset_right = -260.0
+offset_bottom = -89.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme = ExtResource("1_4b7lu")
+script = ExtResource("2_4b7lu")
+
+[node name="QuickSearchController" parent="." instance=ExtResource("3_m0lym")]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Sidebar" type="PanelContainer" parent="."]
+layout_mode = 2
+
+[node name="Stack" type="VBoxContainer" parent="Sidebar"]
+layout_mode = 2
+
+[node name="CurrentSlugLabel" type="RichTextLabel" parent="Sidebar/Stack"]
+custom_minimum_size = Vector2(500, 40)
+layout_mode = 2
+text = "slug.name.goes.here"
+scroll_active = false
+
+[node name="CurrentLocalizedTextLabel" type="RichTextLabel" parent="Sidebar/Stack"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+size_flags_vertical = 3
+text = "This is a preview of the localized string that you're currently looking at."

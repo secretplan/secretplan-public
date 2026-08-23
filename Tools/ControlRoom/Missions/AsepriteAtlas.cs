@@ -1,12 +1,11 @@
-﻿using ControlRoom.Core;
-using ControlRoom.Programs;
-using SecretPlanCore.Core;
+﻿using ControlRoomLib.Core;
+using ControlRoomLib.Programs;
 
 namespace ControlRoom.Missions;
 
 public class AsepriteAtlas : Mission
 {
-    public AsepriteAtlas(List<string> rawArgs) : base(rawArgs)
+    public AsepriteAtlas(List<string> rawArgs, MissionVariables missionVariables) : base(rawArgs, missionVariables)
     {
     }
 

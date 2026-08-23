@@ -8,4 +8,6 @@ public interface IResourceReference
     ///     Underlying type of the Resource this wraps
     /// </summary>
     public Type ResourceType { get; }
+
+    object? GetOrLoadOrNullTypeless();
 }

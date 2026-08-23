@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://cq621w63ll1ac"]
+
+[ext_resource type="Script" uid="uid://yuteaqxkvy7q" path="res://FriendShapedPlugin/ConfigEditor/LocalizationIdAndSlugEditor.cs" id="1_5wpmy"]
+[ext_resource type="PackedScene" uid="uid://bxr86dlhbftis" path="res://FriendShapedPlugin/ConfigEditor/Scenes/StringFieldEditor.tscn" id="2_vspn7"]
+
+[node name="IdAndSlugEditor" type="VBoxContainer" unique_id=432381800]
+offset_right = 190.0
+offset_bottom = 102.0
+size_flags_horizontal = 3
+script = ExtResource("1_5wpmy")
+
+[node name="SlugEditor" parent="." unique_id=1271740042 instance=ExtResource("2_vspn7")]
+layout_mode = 2
+
+[node name="IdLabel" type="Label" parent="." unique_id=2018044397]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "12345"

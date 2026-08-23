@@ -12,6 +12,11 @@ public class CachedPackedScene<T> : CachedResource<PackedScene> where T : Node
     {
         return GetOrLoad().Instantiate<T>();
     }
+    
+    public T? LoadAndInstantiateOrNull()
+    {
+        return GetOrLoadOrNull()?.Instantiate<T>();
+    }
 
     public LoadingHandle LoadAndInstantiateAsync(Action<T> onLoadFinished)
     {

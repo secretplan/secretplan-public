@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text;
+using Newtonsoft.Json;
 using SecretPlanCore.Core;
 
 namespace SecretPlanCore.Configuration;
@@ -33,19 +34,57 @@ public record struct ConfigInstanceInfo(
 
     public string ShortName()
     {
-        var name = new FileInfo(Name).Name.RemoveFileExtension()
-            .Replace("_", "")
-            .Replace("-", "");
+        var nameStringBuilder = new StringBuilder();
+        foreach (var character in new FileInfo(Name).Name.RemoveFileExtension())
+        {
+            if (!char.IsAscii(character))
+            {
+                nameStringBuilder.Append((int)character);
+                continue;
+            }
+
+            if (character is '_' or '-' or ' ')
+            {
+                continue;
+            }
+
+            nameStringBuilder.Append(character);
+        }
+
+        var name = nameStringBuilder.ToString();
+
         if (name.StartsWith(TypeId))
         {
             name = name.Substring(TypeId.Length, name.Length - TypeId.Length);
         }
-        
+
         if (char.IsNumber(name[0]))
         {
             name = "N" + name;
         }
-        
+
         return name;
+    }
+
+    /// <summary>
+    ///     Sort of like ShortName but a little different
+    /// </summary>
+    public string NameWithoutPathOrExtensionOrType()
+    {
+        var name = new FileInfo(Name).Name.RemoveFileExtension();
+
+        var typeIdUnderscore = $"{TypeId}_";
+        if (name.StartsWith(typeIdUnderscore))
+        {
+            name = name.Substring(typeIdUnderscore.Length, name.Length - typeIdUnderscore.Length);
+        }
+
+        return name;
+    }
+
+    public string Directory()
+    {
+        var tokens = Name.SplitDirectorySeparators();
+        return string.Join("/", tokens.SkipLast(1));
     }
 }

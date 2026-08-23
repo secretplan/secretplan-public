@@ -1,11 +1,11 @@
-﻿using ControlRoom.Core;
-using ControlRoom.Programs;
+﻿using ControlRoomLib.Core;
+using ControlRoomLib.Programs;
 
 namespace ControlRoom.Missions;
 
 public class DownloadLatest : Mission
 {
-    public DownloadLatest(List<string> rawArgs) : base(rawArgs)
+    public DownloadLatest(List<string> rawArgs, MissionVariables missionVariables) : base(rawArgs, missionVariables)
     {
     }
 

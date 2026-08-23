@@ -1,0 +1,19 @@
+[gd_scene format=3 uid="uid://c1n2nlbciott0"]
+
+[ext_resource type="Script" uid="uid://dpbi8ln3o3op3" path="res://FriendShapedPlugin/ConfigEditor/Vector3Editor.cs" id="1_6b0un"]
+[ext_resource type="PackedScene" uid="uid://bkbxvk8oj48a1" path="res://FriendShapedPlugin/ConfigEditor/Scenes/NumberFieldEditor.tscn" id="2_44xx5"]
+
+[node name="VectorEditor" type="HBoxContainer" unique_id=539088552]
+offset_right = 563.0
+offset_bottom = 56.0
+size_flags_horizontal = 3
+script = ExtResource("1_6b0un")
+
+[node name="X" parent="." unique_id=494163593 instance=ExtResource("2_44xx5")]
+layout_mode = 2
+
+[node name="Y" parent="." unique_id=1784920262 instance=ExtResource("2_44xx5")]
+layout_mode = 2
+
+[node name="Z" parent="." unique_id=1809750737 instance=ExtResource("2_44xx5")]
+layout_mode = 2
