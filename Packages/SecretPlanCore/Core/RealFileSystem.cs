@@ -260,7 +260,11 @@ public class RealFileSystem : IFileSystem
 
     public void DeleteDirectory(string path, bool recursive)
     {
-        Directory.Delete(ToAbsolutePath(path), recursive);
+        var finalPath = ToAbsolutePath(path);
+        if (Directory.Exists(finalPath))
+        {
+            Directory.Delete(finalPath, recursive);
+        }
     }
 
     public bool HasDirectory(string relativePathToDirectory)
