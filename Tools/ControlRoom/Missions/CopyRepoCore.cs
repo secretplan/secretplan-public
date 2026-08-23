@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Text.RegularExpressions;
 using ControlRoomLib.BaseMissions;
 using ControlRoomLib.Core;
 using ControlRoomLib.Missions;
@@ -21,17 +22,82 @@ public class CopyRepoCore : Mission
             // null means "use own URL"
             sourceRepoUrl = null;
         }
-        
-        var sourceRepo = 
-            await VirtualRepo.GetAndInitialize(sourceRepoUrl, "SourceRepo");
-        
+
+
+        var sourceRepo =
+            await VirtualRepo.GetAndInitialize(sourceRepoUrl, sourceRepoUrl != null ? MakeSafeFilePath(sourceRepoUrl) : "SelfRepo");
+
+        var destinationRepoUrl = PositionalArgs.Get(1, "Target Repo ssh URL").ParseAsString();
         var destinationRepo =
-            await VirtualRepo.GetAndInitialize(PositionalArgs.Get(1, "Target Repo ssh URL").ParseAsString(), "TargetRepo");
+            await VirtualRepo.GetAndInitialize(destinationRepoUrl, MakeSafeFilePath(destinationRepoUrl));
 
         await CopyCoreRepoContents(sourceRepo, destinationRepo);
     }
 
-    public static async Task CopyCoreRepoContents(VirtualRepo sourceRepo, VirtualRepo destinationRepo, string? message = null, Func<RealFileSystem, Task>? scrub = null)
+    private string MakeSafeFilePath(string input)
+    {
+        var replacementChar = '_';
+        
+        string[] reservedNames =
+        {
+            "CON", "PRN", "AUX", "NUL",
+            "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9",
+            "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9"
+        };
+
+        if (string.IsNullOrWhiteSpace(input))
+        {
+            return "untitled";
+        }
+
+        // 1. Remove invalid characters based on the OS
+        var invalidChars = Path.GetInvalidFileNameChars();
+        var sb = new StringBuilder(input.Length);
+
+        foreach (var c in input)
+        {
+            sb.Append(invalidChars.Contains(c) ? replacementChar : c);
+        }
+
+        var result = sb.ToString().Trim();
+
+        // 2. Handle Windows-specific edge cases (trailing dots/spaces and reserved words)
+        // Strip trailing periods or spaces which are invalid on Windows
+        result = Regex.Replace(result, @"[\.\s]+$", "");
+
+        // If the entire string was stripped, provide a fallback
+        if (string.IsNullOrEmpty(result))
+        {
+            return "untitled";
+        }
+
+        // Check against Windows reserved system names
+        var nameWithoutExtension = Path.GetFileNameWithoutExtension(result).ToUpperInvariant();
+        if (reservedNames.Contains(nameWithoutExtension))
+        {
+            result = replacementChar + result;
+        }
+
+        // 3. Enforce Max Length constraints (Windows standard max filename is 255 chars)
+        if (result.Length > 255)
+        {
+            var ext = Path.GetExtension(result);
+            var maxNameLength = 255 - ext.Length;
+            if (maxNameLength <= 0)
+            {
+                result = result.Substring(0, 255);
+            }
+            else
+            {
+                result = result.Substring(0, maxNameLength) + ext;
+            }
+        }
+
+        return result;
+    }
+
+    public static async Task CopyCoreRepoContents(VirtualRepo sourceRepo, VirtualRepo destinationRepo,
+        string? message = null, Func<RealFileSystem, Task>? scrub = null)
     {
         string[] exactFilesToCopy =
         [
@@ -57,7 +123,7 @@ public class CopyRepoCore : Mission
         foreach (var directoryPath in directoriesToCopy)
         {
             destinationRepo.Files.DeleteDirectory(directoryPath, true);
-            
+
             await CopyDirectory(sourceRepo.Files.GetPathOfFile(directoryPath),
                 destinationRepo.Files.GetPathOfFile(directoryPath));
         }
@@ -106,7 +172,8 @@ public class CopyRepoCore : Mission
             await scrub.Invoke(destinationRepo.Files);
         }
 
-        await PushContents(destinationRepo, message ?? $"Copied {await sourceRepo.RepoUrl()}@{await sourceRepo.Git.CurrentSha()}");
+        await PushContents(destinationRepo,
+            message ?? $"Copied {await sourceRepo.RepoUrl()}@{await sourceRepo.Git.CurrentSha()}");
     }
 
     private static async Task PushContents(VirtualRepo destinationRepo, string message)
