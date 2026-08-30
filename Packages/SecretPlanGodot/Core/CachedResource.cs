@@ -15,7 +15,7 @@ public class CachedResource<T> where T : Resource
 
     public bool IsValid()
     {
-        return ResourceLoader.Exists(Path);
+        return SecretResourceLoader.Exists(Path);
     }
 
     public T? GetOrLoadOrNull()
@@ -47,7 +47,7 @@ public class CachedResource<T> where T : Resource
 
     protected Error StartAsyncLoad()
     {
-        var error = ResourceLoader.LoadThreadedRequest(Path);
+        var error = SecretResourceLoader.LoadThreadedRequest(Path);
         if (error != Error.Ok)
         {
             throw new Exception($"Failed to find resource {Path}");
@@ -58,14 +58,12 @@ public class CachedResource<T> where T : Resource
 
     protected (ResourceLoader.ThreadLoadStatus, float) GetAsyncLoadStatus()
     {
-        Array x = [1];
-        var status = ResourceLoader.LoadThreadedGetStatus(Path, x);
-        return (status, x[0].As<float>());
+        return SecretResourceLoader.LoadThreadedGetStatus(Path);
     }
 
     protected T FinishAsyncLoad()
     {
-        var loadedResult = ResourceLoader.LoadThreadedGet(Path);
+        var loadedResult = SecretResourceLoader.LoadThreadedGet(Path);
         return loadedResult as T ??
                throw new Exception($"Could not cast {loadedResult?.GetType().Name} to {typeof(T).Name}");
     }

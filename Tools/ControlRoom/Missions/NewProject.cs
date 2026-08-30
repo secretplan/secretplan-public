@@ -49,7 +49,7 @@ public class NewProject : Mission
         sampleCsFile.AppendLine();
         sampleCsFile.AppendLine("}");
 
-        await projectDirectory.WriteToFileAsync("Scripts/Sample.cs", sampleCsFile.ToString());
+        await projectDirectory.WriteToFileAsync($"{newAssemblyName}/Sample.cs", sampleCsFile.ToString());
 
         VersionChange.WriteVersionFile(projectDirectory, new SecretPlanVersion());
 

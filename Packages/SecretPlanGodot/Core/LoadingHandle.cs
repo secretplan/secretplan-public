@@ -6,7 +6,7 @@ namespace SecretPlanGodot.Core;
 public class LoadingHandle
 {
     private readonly Func<(ResourceLoader.ThreadLoadStatus, float)> _getStatusFunc;
-    private readonly string _label;
+    public string Label { get; }
     private readonly Action _onFinished;
     private readonly Func<Error> _start;
     private int _finishDelayFrames = 5;
@@ -16,7 +16,7 @@ public class LoadingHandle
     public LoadingHandle(string label, Func<Error> start, Func<(ResourceLoader.ThreadLoadStatus, float)> getStatusFunc,
         Action onFinished)
     {
-        _label = label;
+        Label = label;
         _start = start;
         _getStatusFunc = getStatusFunc;
         _onFinished = onFinished;
@@ -24,7 +24,7 @@ public class LoadingHandle
 
     public override string ToString()
     {
-        return _label;
+        return Label;
     }
 
     public ResourceLoader.ThreadLoadStatus Poll()
@@ -35,15 +35,15 @@ public class LoadingHandle
 
             if (_startDelayFrames == 0)
             {
-                LocalClient.Print($"Starting load for: {_label}");
+                LocalClient.Print($"HNDL: Starting load for: {Label}");
                 var startResult = _start();
 
                 if (startResult != Error.Ok)
                 {
-                    throw new Exception($"Async action failed to start {startResult}");
+                    throw new Exception($"HNDL: Async action failed to start {startResult}");
                 }
 
-                LocalClient.Print("Load started, will come back when it's finished");
+                LocalClient.Print("HNDL: Load started, will come back when it's finished");
             }
 
             return ResourceLoader.ThreadLoadStatus.InProgress;
@@ -55,8 +55,9 @@ public class LoadingHandle
             _finishDelayFrames--;
             if (_finishDelayFrames == 0)
             {
-                LocalClient.Print($"Finished load for: {_label}");
+                LocalClient.Print($"HNDL: Finished load for: {Label}");
                 _onFinished();
+                return ResourceLoader.ThreadLoadStatus.Loaded; 
             }
 
             return ResourceLoader.ThreadLoadStatus.InProgress;

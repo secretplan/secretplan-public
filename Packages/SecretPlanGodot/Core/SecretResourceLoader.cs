@@ -2,6 +2,7 @@
 using Godot;
 using SecretPlanGodot.Configuration;
 using SecretPlanGodot.Serialization;
+using Array = Godot.Collections.Array;
 
 namespace SecretPlanGodot.Core;
 
@@ -50,11 +51,15 @@ public static class SecretResourceLoader
                 var image = Image.LoadFromFile(userPath);
                 return new ImageTexture { Image = image };
             }
-            
+
             if (ResourceReferenceUtilities.PathLooksLikeResource<AudioStreamOggVorbis>(userPath))
             {
-                var stream = AudioStreamOggVorbis.LoadFromFile(userPath);
-                return stream;
+                return AudioStreamOggVorbis.LoadFromFile(userPath);
+            }
+            
+            if (ResourceReferenceUtilities.PathLooksLikeResource<AudioStreamWav>(userPath))
+            {
+                return AudioStreamWav.LoadFromFile(userPath);
             }
 
             return null;
@@ -65,7 +70,7 @@ public static class SecretResourceLoader
 
     private static Resource? LoadTypelessSimple(string path)
     {
-        if (!ResourceLoader.Exists(path))
+        if (!Exists(path))
         {
             return null;
         }
@@ -83,7 +88,7 @@ public static class SecretResourceLoader
 
     public static T LoadTypedConfident<T>(string path) where T : Resource
     {
-        if (!ResourceLoader.Exists(path))
+        if (!Exists(path))
         {
             throw new Exception($"Failed to find resource {path}");
         }
@@ -95,7 +100,7 @@ public static class SecretResourceLoader
     {
         foreach (var entry in ResourceLoader.ListDirectory(path))
         {
-            if (ignoreDotGodot && entry == ".godot")
+            if (ignoreDotGodot && entry == "res://.godot/")
             {
                 continue;
             }
@@ -137,9 +142,48 @@ public static class SecretResourceLoader
         {
             // If it's a .ogg or .png or something that wants an import. ResourceLoader will blissfully ignore it!
             // So we need to ask the filesystem directly if the file exists.
-            return CommonSerializationConstants.AppDataFiles.GetDirectory("Mods").HasFile(path.Remove(0,"mods://".Length));
+            return CommonSerializationConstants.AppDataFiles.GetDirectory("Mods")
+                .HasFile(path.Remove(0, "mods://".Length));
         }
 
         return ResourceLoader.Exists(path);
+    }
+
+    public static Error LoadThreadedRequest(string path)
+    {
+        var finalPath = path;
+
+        if (LocalClient.IsModdingEnabled && path.StartsWith("mods://"))
+        {
+            finalPath = path.Replace("mods://", "user://Mods/");
+        }
+
+        return ResourceLoader.LoadThreadedRequest(finalPath);
+    }
+
+    public static (ResourceLoader.ThreadLoadStatus, float) LoadThreadedGetStatus(string path)
+    {
+        var finalPath = path;
+
+        if (LocalClient.IsModdingEnabled && path.StartsWith("mods://"))
+        {
+            finalPath = path.Replace("mods://", "user://Mods/");
+        }
+
+        Array outArray = [1];
+        var status = ResourceLoader.LoadThreadedGetStatus(finalPath, outArray);
+        return (status, outArray[0].As<float>());
+    }
+
+    public static Resource LoadThreadedGet(string path)
+    {
+        var finalPath = path;
+
+        if (LocalClient.IsModdingEnabled && path.StartsWith("mods://"))
+        {
+            finalPath = path.Replace("mods://", "user://Mods/");
+        }
+
+        return ResourceLoader.LoadThreadedGet(finalPath);
     }
 }

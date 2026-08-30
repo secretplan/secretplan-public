@@ -51,7 +51,7 @@ public static class GodotUtilities
                 continue;
             }
 
-            if (shouldAllow != null && shouldAllow(resPath))
+            if (shouldAllow != null && !shouldAllow(resPath))
             {
                 continue;
             }

@@ -44,6 +44,11 @@ public class PackedSceneReferenceTyped<T> : IResourceReference where T : Node
         return CachedPackedScene.GetOrLoadOrNull();
     }
 
+    public T LoadAndInstantiate()
+    {
+        return CachedPackedScene.GetOrLoad().Instantiate<T>();
+    }
+
     public TDerived LoadAndInstantiateAs<TDerived>() where TDerived : T
     {
         return CachedPackedScene.GetOrLoad().Instantiate<TDerived>();

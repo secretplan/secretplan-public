@@ -55,7 +55,6 @@ public static class CommonSerializationConstants
             }
 
             var json = configFileAccess.GetAsText();
-
             var untypedInstance = ConfigServer.Instance.LoadFromJsonUntyped(configFileName, json, true);
             var id = untypedInstance?.InstanceInfo.InstanceId ?? 0;
             var loadedInstance = ConfigServer.Instance.GetInstanceUntyped(id);

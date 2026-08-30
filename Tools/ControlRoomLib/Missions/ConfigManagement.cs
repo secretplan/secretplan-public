@@ -233,7 +233,7 @@ public class ConfigManagement : Mission
     {
         await SetupConfigServer(MissionVariables.GameDirectoryFiles());
 
-        var newInstance = ConfigServer.Instance.CreateInstance(typeId, name);
+        var newInstance = ConfigServer.Instance.CreateInstance(typeId, name, "Config");
 
         if (newInstance == null)
         {

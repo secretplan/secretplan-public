@@ -1,18 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using SecretPlanCore.Configuration;
+﻿using SecretPlanCore.Configuration;
 
-namespace BirdGame.Core;
+namespace SecretPlanGodot.ConfigEditor;
 
 public static class FilteredConfigServer
 {
+    private static readonly List<Func<Config, bool>> _filters = new();
     private static readonly Dictionary<Type, bool> _isExactTypeHiddenCache = new();
     private static readonly HashSet<Type> _hiddenTypes = new();
 
+    /// <summary>
+    ///     Filters return true if the config should be allowed, false if it should not
+    /// </summary>
+    public static void AddFilter(Func<Config, bool> filter)
+    {
+        _filters.Add(filter);
+    }
+
     public static IEnumerable<Config> GetAllInstances()
     {
-        return ConfigServer.Instance.GetAllInstances().Where(instance => !IsTypeHidden(instance.GetType()));
+        return ConfigServer.Instance.GetAllInstances().Where(instance => !IsTypeHidden(instance.GetType()) && _filters.All(filter => filter(instance)));
     }
 
     public static IEnumerable<TConfig> GetAllInstancesOfType<TConfig>()
@@ -34,7 +40,7 @@ public static class FilteredConfigServer
         {
             return result;
         }
-        
+
         foreach (var hiddenType in _hiddenTypes)
         {
             if (type.IsAssignableTo(hiddenType))
@@ -78,7 +84,7 @@ public static class FilteredConfigServer
         {
             return false;
         }
-        
+
         return _hiddenTypes.Contains(type);
     }
 }

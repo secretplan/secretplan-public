@@ -259,20 +259,26 @@ public class ConfigServer
     /// <summary>
     ///     Creates an instance that can be used in-memory or written to disk
     /// </summary>
-    public Config? CreateInstance(Type type, string simpleName)
+    public Config? CreateInstance(Type type, string simpleName, string? path)
     {
         if (Activator.CreateInstance(type) is not Config configInstance)
         {
             return null;
         }
 
-        configInstance.InstanceInfo = configInstance.InstanceInfo with { Name = CreateFileName(type, simpleName) };
+        var fileName = CreateFileName(type, simpleName);
+        if (!string.IsNullOrEmpty(path))
+        {
+            fileName = $"{path}/{fileName}";
+        }
+
+        configInstance.InstanceInfo = configInstance.InstanceInfo with { Name = fileName };
 
         CacheInstanceId(configInstance);
         return configInstance;
     }
 
-    public Config? CreateInstance(string typeId, string simpleName)
+    public Config? CreateInstance(string typeId, string simpleName, string? path)
     {
         var type = TypeFromId(typeId);
 
@@ -282,7 +288,7 @@ public class ConfigServer
             return null;
         }
 
-        return CreateInstance(type, simpleName);
+        return CreateInstance(type, simpleName, path);
     }
 
     public bool AreSame(Config a, Config b)
@@ -292,7 +298,7 @@ public class ConfigServer
 
     public T? CreateInstance<T>(string instanceName) where T : Config
     {
-        return CreateInstance(typeof(T), instanceName) as T;
+        return CreateInstance(typeof(T), instanceName, null) as T;
     }
 
     public uint GenerateInstanceId()
@@ -321,9 +327,17 @@ public class ConfigServer
             return null;
         }
 
+        var directory = original.InstanceInfo.Directory();
+
+        var fileName = CreateFileName(type, newName);
+        if (!string.IsNullOrEmpty(directory))
+        {
+            fileName = $"{directory}/{fileName}";
+        }
+        
         clone.InstanceInfo = clone.InstanceInfo with
         {
-            InstanceId = GenerateInstanceId(), Name = CreateFileName(type, newName)
+            InstanceId = GenerateInstanceId(), Name = fileName
         };
 
         CacheInstanceId(clone);
@@ -637,7 +651,6 @@ public class ConfigServer
         }
 
         var newFileName = path + CreateFileName(instanceToRename.GetType(), newSimpleName);
-
         
         instanceToRename.InstanceInfo = instanceToRename.InstanceInfo with { Name = newFileName };
 
